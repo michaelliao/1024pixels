@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="1024 pixels art on Polygon blockchain.">
+
+    <title>1024 Pixels Art</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.0.32/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/snarkjs@0.5.0/build/snarkjs.min.js"></script>
+
+    <style>
+        div.toolbar>div.btn-outline-secondary:hover {
+            color: #6c757d;
+            background-color: rgba(0, 0, 0, 0);
+            border-color: #6c757d;
+        }
+
+        div.toolbar div.btn {
+            margin: 5px;
+        }
+
+        div.toolbar>div.btn:hover {
+            box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
+            transform: scale(1.1);
+            transition: all 0.1s;
+        }
+
+        div.canvas {
+            position: relative;
+            width: 516px;
+            height: 516px;
+            border: 2px solid #ccc;
+        }
+
+        div.canvas>canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .transparent {
+            background-image: url("transparent.png");
+            background-repeat: repeat;
+            background-position: 0 0;
+        }
+
+        div.selected-colors {
+            position: relative;
+            display: block;
+            width: 100px;
+            height: 100px;
+        }
+
+        div.selected-colors>div {
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            display: block;
+            width: 40px;
+            height: 40px;
+        }
+
+        div.selected-colors>div.fg-color {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        div.selected-colors>div.bg-color {
+            position: absolute;
+            top: 26px;
+            left: 26px;
+        }
+
+        div.selected-colors>a.switch-color {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            top: 0px;
+            left: 44px;
+        }
+
+        div.palette {}
+
+        div.palette div.color {
+            cursor: pointer;
+            display: inline-block;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 24px;
+            height: 24px;
+            margin: 0 10px 10px 0;
+        }
+
+        div.palette div.color:hover {
+            box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+            transform: scale(1.25);
+            transition: all 0.1s;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+
+    <script>
+        class ToolbarButton {
+            key;
+            title;
+            icon;
+            canPressed;
+
+            constructor(key, title, icon, canPressed) {
+                this.key = key;
+                this.title = title;
+                this.icon = icon;
+                this.canPressed = canPressed;
+            }
+        }
+
+        window.CHAIN_ID = 137;
+        window.CHAIN_NAME = 'Polygon';
+        window.SCAN_URL = 'https://polygonscan.com';
+        window.ZERO_ADDR = '0x0000000000000000000000000000000000000000';
+        window.ETH_ADDR = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+        window.NFT_ADDR = '0xFe6667986f58F2F7ed1e7C17Cee3951d8ABb717f';
+        window.NFT_ABI = '[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"redPacketId","type":"uint256"},{"indexed":true,"internalType":"address","name":"creator","type":"address"},{"indexed":true,"internalType":"address","name":"token","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint32","name":"total","type":"uint32"},{"indexed":false,"internalType":"enum RedPacket.BonusType","name":"bonusType","type":"uint8"}],"name":"Create","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"redPacketId","type":"uint256"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"address","name":"token","type":"address"},{"indexed":false,"internalType":"uint256","name":"bonus","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"bonusLeft","type":"uint256"},{"indexed":false,"internalType":"uint32","name":"totalLeft","type":"uint32"}],"name":"Withdraw","type":"event"},{"inputs":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint32","name":"total","type":"uint32"},{"internalType":"enum RedPacket.BonusType","name":"bonusType","type":"uint8"},{"internalType":"uint256","name":"passcodeHash","type":"uint256"},{"internalType":"address","name":"condition","type":"address"}],"name":"create","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"getRedPacket","outputs":[{"components":[{"internalType":"uint256","name":"passcodeHash","type":"uint256"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"amountLeft","type":"uint256"},{"internalType":"address","name":"creator","type":"address"},{"internalType":"address","name":"token","type":"address"},{"internalType":"address","name":"condition","type":"address"},{"internalType":"uint32","name":"total","type":"uint32"},{"internalType":"uint32","name":"totalLeft","type":"uint32"},{"internalType":"enum RedPacket.BonusType","name":"bonusType","type":"uint8"}],"internalType":"struct RedPacket.RedPacketInfo","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"address","name":"addr","type":"address"}],"name":"isOpened","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"uint256[]","name":"proof","type":"uint256[]"}],"name":"open","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256[2]","name":"a","type":"uint256[2]"},{"internalType":"uint256[2][2]","name":"b","type":"uint256[2][2]"},{"internalType":"uint256[2]","name":"c","type":"uint256[2]"},{"internalType":"uint256[2]","name":"input","type":"uint256[2]"}],"name":"verifyProof","outputs":[{"internalType":"bool","name":"r","type":"bool"}],"stateMutability":"view","type":"function"}]';
+        window.ERC20_ABI = '[{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]';
+        window.TRANSFER_TOPIC = '0xf526b6d6ff0fac13f7e16aeea0f08bc8f0789c188dc429de0ea4b56bc06e82c6';
+        window.TRANSPARENT_COLOR = '#111111';
+        window.INDEX_COLORS = [
+            '#ff8080', '#ffff80', '#80ff80', '#00ff80', '#80ffff', '#0080ff', '#ff80c0', '#ff80ff',
+            '#ff0000', '#ffff00', '#80ff00', '#00ff40', '#00ffff', '#0080c0', '#8080c0', '#ff00ff',
+            '#804040', '#ff8040', '#00ff00', '#008080', '#004080', '#8080ff', '#800040', '#ff0080',
+            '#800000', '#ff8000', '#008000', '#008040', '#0000ff', '#0000a0', '#800080', '#8000ff',
+            '#400000', '#804000', '#004000', '#004040', '#000080', '#000040', '#400040', '#400080',
+            '#000000', '#808000', '#808040', '#808080', '#408080', '#c0c0c0', '#ffffff', 'transparent'
+        ];
+
+        function toRGB(hex) {
+            if (hex.startsWith('#')) {
+                hex = hex.substring(1);
+            }
+            let rgb = parseInt(hex, 16);
+            return [(rgb & 0xff0000) >> 16, (rgb & 0xff00) >> 8, rgb & 0xff];
+        }
+
+        function convertRgbColors() {
+            let colors = [];
+            for (let i = 0; i < window.INDEX_COLORS.length - 1 /* skip last transparent color */; i++) {
+                colors.push(toRGB(window.INDEX_COLORS[i]));
+            }
+            return colors;
+        }
+
+        window.RGB_COLORS = convertRgbColors();
+
+        function findMatchedIndexColor(r, g, b, a) {
+            if (a < 128) {
+                return window.INDEX_COLORS.length - 1;
+            }
+            let
+                diff = 1000.0,
+                rgbColors = window.RGB_COLORS,
+                matched = 0;
+            for (let i = 0; i < rgbColors.length; i++) {
+                let
+                    rgb = rgbColors[i]
+                d = Math.sqrt(Math.pow(rgb[0] - r, 2) + Math.pow(rgb[1] - g, 2) + Math.pow(rgb[2] - b, 2));
+                if (diff > d) {
+                    diff = d;
+                    matched = i;
+                }
+            }
+            return matched;
+        }
+
+        $(function () {
+            // TODO:
+        });
+
+        function buildPalette() {
+            let palette = [];
+            for (let i = 0; i < 6; i++) {
+                let cc = [];
+                for (let j = 0; j < 8; j++) {
+                    cc.push(i * 8 + j);
+                }
+                palette.push(cc);
+            }
+            return palette;
+        }
+
+        function buildCanvasIndexes() {
+            let
+                defaultColor = window.INDEX_COLORS.length - 2, // white
+                canvas = [];
+            for (let i = 0; i < 32 * 32; i++) {
+                canvas.push(defaultColor);
+            }
+            return canvas;
+        }
+
+        function createTransparentTile() {
+            // create transparent tile:
+            let offscreen = document.createElement('canvas');
+            offscreen.width = 64;
+            offscreen.height = 64;
+            let g = offscreen.getContext('2d');
+            g.fillStyle = '#ffffff';
+            g.fillRect(0, 0, 64, 64);
+            g.fillStyle = '#cccccc';
+            for (let x = 0; x < 64; x += 8) {
+                for (let y = 0; y < 64; y += 8) {
+                    g.fillRect(x, y, 4, 4);
+                }
+            }
+            for (let x = 4; x < 64; x += 8) {
+                for (let y = 4; y < 64; y += 8) {
+                    g.fillRect(x, y, 4, 4);
+                }
+            }
+            return offscreen;
+        }
+
+        function keccak(str) {
+            let arr = new TextEncoder().encode(str);
+            return ethers.utils.keccak256(arr);
+        }
+
+        function toBN(s, decimals) {
+            try {
+                return ethers.utils.parseUnits(s.trim(), decimals);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function isValidBN(s, decimals) {
+            let bn = toBN(s, decimals);
+            return bn !== null && !bn.isZero() && !bn.isNegative();
+        }
+
+        function isValidAddress(s) {
+            try {
+                ethers.utils.getAddress(s);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function getWeb3Provider() {
+            if (!window.web3Provider) {
+                if (!window.ethereum) {
+                    console.error("there is no web3 provider.");
+                    return null;
+                }
+                window.web3Provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+            }
+            return window.web3Provider;
+        }
+
+        function showAlert(title, message) {
+            let m = $('#alertModal');
+            m.find('.x-title').text(title);
+            m.find('.x-message').text(message);
+            let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+            myModal.show();
+        }
+
+        function showInfo(title, message) {
+            let m = $('#infoModal');
+            m.find('.x-title').text(title);
+            if (message.startsWith('<')) {
+                m.find('.x-message').html(message);
+            } else {
+                m.find('.x-message').text(message);
+            }
+            let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+            myModal.show();
+        }
+
+        function showLoading(title, message) {
+            let m = $('#loadingModal');
+            let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+            let obj = {
+                setTitle: (t) => {
+                    m.find('.x-title').text(t);
+                },
+                setMessage: (t) => {
+                    m.find('.x-message').text(t);
+                },
+                close: () => {
+                    setTimeout(function () {
+                        myModal.hide();
+                    }, 500);
+                }
+            }
+            obj.setTitle(title);
+            obj.setMessage(message);
+            myModal.show();
+            return obj;
+        }
+
+        function translateError(err) {
+            window.err = err;
+            if (typeof (err) === 'string') {
+                return err;
+            }
+            if (err.error && err.error.code && err.error.message) {
+                return `Error (${err.error.code}): ${err.error.message}`;
+            }
+            if (err.code && err.message) {
+                return `Error (${err.code}): ${err.message}`;
+            }
+            return err.message || err.toString();
+        }
+
+        function init() {
+            console.log('init vue...');
+            let
+                btnUndo = new ToolbarButton('undo', 'Undo', 'arrow-counterclockwise'),
+                btnRedo = new ToolbarButton('redo', 'Redo', 'arrow-clockwise'),
+                btnCopy = new ToolbarButton('copy', 'Copy', 'back'),
+                btnPaste = new ToolbarButton('paste', 'Paste', 'clipboard-plus'),
+                btnEraser = new ToolbarButton('eraser', 'Eraser', 'eraser-fill', true),
+                btnFill = new ToolbarButton('fill', 'Fill', 'paint-bucket', true),
+                btnPick = new ToolbarButton('pick', 'Pick Color', 'eyedropper', true),
+                btnPencil = new ToolbarButton('pencil', 'Pencil', 'pencil', true),
+                btnLine = new ToolbarButton('line', 'Line', 'slash-lg', true),
+                btnRect = new ToolbarButton('rect', 'Rectangle', 'square', true),
+                toolbar = [
+                    btnUndo, btnRedo,
+                    btnCopy, btnPaste,
+                    btnEraser, btnFill,
+                    btnPick, btnPencil,
+                    btnLine, btnRect
+                ],
+                buttons = toolbar.reduce((btns, btn) => { btns[btn.key] = btn; return btns; }, {});
+            window.vm = new Vue({
+                el: '#vm',
+                data: {
+                    account: null,
+                    chainId: 0,
+                    toolbar: toolbar,
+                    buttons: buttons,
+                    canvas: document.getElementById('mainCanvas'),
+                    pressedButton: null,
+                    palette: buildPalette(),
+                    indexTransparent: window.INDEX_COLORS.length - 1,
+                    canvasIndexes: buildCanvasIndexes(),
+                    fgIndex: 40,
+                    bgIndex: 46,
+                    transparentTile: null,
+                    transparentTileUrl: null,
+                    version: 0
+                },
+                computed: {
+                    transparentIndex: function () {
+                        return window.INDEX_COLORS.length - 1;
+                    },
+                    ready: function () {
+                        return this.account && this.chainId > 0;
+                    },
+                    networkName: function () {
+                        if (this.account) {
+                            if (this.chainId === window.CHAIN_ID) {
+                                return window.CHAIN_NAME;
+                            }
+                            return 'Unsupported Chain (0x' + this.chainId.toString(16) + ')';
+                        }
+                        return 'Not connected';
+                    },
+                    wrongNetwork: function () {
+                        return this.account && this.chainId !== window.CHAIN_ID;
+                    }
+                },
+                methods: {
+                    pasteImage: async function () {
+                        if (navigator.clipboard) {
+                            let contents = await navigator.clipboard.read();
+                            console.log(contents);
+                            let foundImage = false;
+                            for (const item of contents) {
+                                if (item.types.includes('image/png')) {
+                                    console.log('paste png...');
+                                    const blob = await item.getType('image/png');
+                                    let img = new Image();
+                                    img.width = 32;
+                                    img.height = 32;
+                                    let that = this;
+                                    img.onload = function () {
+                                        console.log('draw canvas...');
+                                        let canvas = document.getElementById('canvas-32x32');
+                                        let g = canvas.getContext('2d');
+                                        g.drawImage(img, 0, 0, img.width, img.height, 0, 0, 32, 32);
+                                        let iData = g.getImageData(0, 0, 32, 32);
+                                        console.log(iData.data);
+                                        // find rgba:
+                                        let
+                                            data = iData.data,
+                                            dataLength = data.length;
+                                        for (let i = 0; i < dataLength; i += 4) {
+                                            let
+                                                r = data[i],
+                                                g = data[i + 1],
+                                                b = data[i + 2],
+                                                a = data[i + 3],
+                                                matchedIndex = findMatchedIndexColor(r, g, b, a);
+                                            that.canvasIndexes[i / 4] = matchedIndex;
+                                        }
+                                        that.version++;
+                                        that.drawCanvas();
+                                    }
+                                    img.src = URL.createObjectURL(blob);
+                                    foundImage = true;
+                                    break;
+                                }
+                            }
+                        }
+                    },
+                    range: function (n) {
+                        let r = [];
+                        for (let i = 0; i < n; i++) {
+                            r.push(i);
+                        }
+                        return r;
+                    },
+                    selectColor: function (index, isBg) {
+                        this.version++;
+                        if (isBg) {
+                            this.bgIndex = index;
+                        } else {
+                            this.fgIndex = index;
+                        }
+                        console.log(`select ${isBg ? "bg" : "fg"} color: ${index} = ` + this.fixedIndexColor(index));
+                    },
+                    toolbarButtonClick: function (key) {
+                        console.log('button clicked: ' + key);
+                        let btn = this.buttons[key];
+                        if (btn.canPressed) {
+                            if (this.pressedButton === btn) {
+                                this.pressedButton = null;
+                            } else {
+                                this.pressedButton = btn;
+                            }
+                        } else {
+                            let key = btn.key;
+                            if (key === 'paste') {
+                                this.pasteImage();
+                            }
+                        }
+                    },
+                    switchColor: function () {
+                        // switch bg / fg color:
+                        let bg = this.bgIndex;
+                        this.bgIndex = this.fgIndex;
+                        this.fgIndex = bg;
+                    },
+                    indexColor: function (index) {
+                        this.version;
+                        return window.INDEX_COLORS[index];
+                    },
+                    fixedIndexColor: function (index) {
+                        return window.INDEX_COLORS[index];
+                    },
+                    pointColorIndex: function (x, y) {
+                        return this.canvasIndexes[y * 32 + x];
+                    },
+                    pointColor: function (x, y) {
+                        return this.indexColor(this.pointColorIndex(x, y));
+                    },
+                    drawCanvas: function () {
+                        let
+                            x, y,
+                            size = 512,
+                            tile = size / 32,
+                            g = this.canvas.getContext('2d');
+                        g.imageSmoothingEnabled = false;
+                        for (y = 0; y < 32; y++) {
+                            for (x = 0; x < 32; x++) {
+                                this.drawPoint(x, y, g);
+                            }
+                        }
+                    },
+                    drawPoint: function (x, y, g) {
+                        let
+                            tile = 32,
+                            index = this.canvasIndexes[y * 32 + x];
+                        if (!g) {
+                            g = this.canvas.getContext('2d');
+                        }
+                        if (index !== this.indexTransparent) {
+                            g.fillStyle = window.INDEX_COLORS[index];
+                            g.fillRect(x * tile, y * tile, tile, tile);
+                        } else {
+                            g.putImageData(this.transparentTile, x * tile, y * tile);
+                        }
+                    },
+                    setPoint: function (x, y) {
+                        this.version++;
+                        let key = this.pressedButton ? this.pressedButton.key : '';
+                        console.log(`${key}: ${x}, ${y}`);
+                        if (key === 'pencil') {
+                            this.canvasIndexes[y * 32 + x] = this.fgIndex;
+                            this.drawPoint(x, y);
+                        }
+                    },
+                    createPixelArt: async function () {
+                        // check:
+                        let
+                            chainId = this.chainId,
+                            tokenAddress,
+                            tokenAmount,
+                            decimals,
+                            total,
+                            bonusType,
+                            password,
+                            account,
+                            passcode,
+                            passcodeHash,
+                            conditionAddress = window.ZERO_ADDR,
+                            value,
+                            redPacketId = 0;
+                        if (!this.ready) {
+                            return showAlert('Error', 'Please connect to wallet first!');
+                        }
+                        if (this.wrongNetwork) {
+                            return showAlert('Error', 'The connected network is not supported!');
+                        }
+                        // important: account must be lowercase:
+                        account = this.account.toLowerCase();
+                        if (this.tokenType === 'ETH') {
+                            tokenAddress = window.ETH_ADDR;
+                            decimals = 18;
+                        } else {
+                            if (!isValidAddress(this.tokenAddress)) {
+                                return showAlert('Error', 'Token address is invalid!');
+                            }
+                            tokenAddress = this.tokenAddress;
+                            let
+                                loading1 = showLoading('Get ERC Token', 'Get ERC token information...'),
+                                erc1 = new ethers.Contract(tokenAddress, window.ERC20_ABI, window.getWeb3Provider().getSigner());
+                            try {
+                                decimals = await erc1.decimals();
+                                loading1.close();
+                                console.log('got erc ' + tokenAddress + ' decimals = ' + decimals + ' type = ' + typeof (decimals));
+                            }
+                            catch (err) {
+                                loading1.close();
+                                return showAlert('Error', 'Failed to get decimals of token: ' + translateError(err));
+                            }
+                        }
+                        // check tokenAmount:
+                        if (!isValidBN(this.tokenAmount, decimals)) {
+                            return showAlert('Error', 'Bonus amount is invalid!');
+                        }
+                        tokenAmount = toBN(this.tokenAmount, decimals);
+                        total = parseInt(this.total);
+                        if (isNaN(total) || total < 0 || total > 100000) {
+                            return showAlert('Error', 'Max perticipates is invalid!');
+                        }
+                        bonusType = parseInt(this.bonusType);
+                        // check password:
+                        password = this.password.trim();
+                        if (password === '') {
+                            return showAlert('Error', 'Password must be set!');
+                        }
+
+                        // now generate password hash:
+                        passcode = ethers.BigNumber.from(keccak(account + password));
+                        let { proof, publicSignals } = await prove(ethers.BigNumber.from('0'), passcode);
+                        console.log(publicSignals);
+                        passcodeHash = ethers.BigNumber.from(publicSignals[0]);
+                        console.log('keccak(' + (account + password) + ') = ' + passcode.toHexString());
+                        console.log('passcode hash = ', passcodeHash.toHexString());
+
+                        let
+                            loading = showLoading('Create', 'Check balance...'),
+                            redPacket = new ethers.Contract(window.RED_PACKET_ADDR, window.RED_PACKET_ABI, window.getWeb3Provider().getSigner());
+                        try {
+                            if (tokenAddress === window.ETH_ADDR) {
+                                let eth_balance = await window.getWeb3Provider().getBalance(account);
+                                if (eth_balance.lt(tokenAmount)) {
+                                    throw 'You don\'t have enough ' + this.nativeToken + '.';
+                                }
+                            } else {
+                                let
+                                    erc = new ethers.Contract(tokenAddress, window.ERC20_ABI, window.getWeb3Provider().getSigner()),
+                                    erc_symbol = await erc.symbol(),
+                                    erc_balance = await erc.balanceOf(account);
+                                if (erc_balance.lt(tokenAmount)) {
+                                    throw 'You don\'t have enough ' + erc_symbol + '.';
+                                }
+                                console.log('check allowance...');
+                                loading.setMessage('Check allowance...');
+                                let erc_allowance = await erc.allowance(account, window.RED_PACKET_ADDR);
+                                console.log('allowance = ' + erc_allowance);
+                                if (erc_allowance.lt(tokenAmount)) {
+                                    console.log('must increase allowance.');
+                                    loading.setMessage('Please approve the Red Packet contract to spend your ' + erc_symbol + ' in MetaMask...');
+                                    let tx_approve = await erc.approve(window.RED_PACKET_ADDR, ethers.utils.parseUnits('1000000000000000000', 18));
+                                    loading.setMessage('Please wait for blockchain confirmation...');
+                                    await tx_approve.wait(1);
+                                }
+                            }
+                            loading.setMessage('Please sign transaction in MetaMask...');
+                            value = tokenAddress === window.ETH_ADDR ? tokenAmount : 0;
+                            console.log('tokenAddress = ' + tokenAddress + '\n' +
+                                'tokenAmount = ' + tokenAmount + ', type = ' + typeof (tokenAmount) + '\n' +
+                                'total = ' + total + '\n' +
+                                'bonusType = ' + bonusType + '\n' +
+                                'passcodeHash = ' + passcodeHash + '\n' +
+                                'conditionAddress = ' + conditionAddress + '\n' +
+                                'value = ' + value
+                            );
+                            let tx = await redPacket.create(
+                                tokenAddress,
+                                tokenAmount,
+                                total,
+                                bonusType,
+                                passcodeHash,
+                                conditionAddress,
+                                {
+                                    value: value
+                                }
+                            );
+                            loading.setMessage('Please wait for blockchain confirmation...');
+                            await tx.wait(1);
+                            loading.setMessage('Get transaction logs...');
+                            // get red packet id from log:
+                            let receipt = await getWeb3Provider().getTransactionReceipt(tx.hash);
+                            let logs = receipt.logs;
+                            for (let i = 0; i < logs.length; i++) {
+                                let log = logs[i];
+                                if (log.topics && log.topics[0] === window.CREATE_TOPIC) {
+                                    redPacketId = parseInt(log.data.substring(0, 66), 16);
+                                    console.log('red packet id: ' + redPacketId);
+                                    break;
+                                }
+                            }
+                            loading.close();
+                            let url = location.protocol + '//' + location.host + '/rp.html?chain=' + chainId + '&id=' + redPacketId;
+                            showInfo('Success', '<p>Red packet created successfully!</p><p>Password: ' +
+                                password + '</p><p>You can share this red packet:</p><p><a target="_blank" href="' +
+                                url + '">' + url + ' <i class="bi bi-box-arrow-up-right"></i></a></p>');
+                        } catch (err) {
+                            loading.close();
+                            return showAlert('Error', translateError(err));
+                        }
+                    },
+                    abbrAddress: function (addr) {
+                        if (!addr) {
+                            return '';
+                        }
+                        let s = addr.toString();
+                        if (s.indexOf('0x') === 0 && s.length === 42) {
+                            let addr = ethers.utils.getAddress(s.substring(0));
+                            return addr.substring(0, 6) + '...' + addr.substring(38);
+                        }
+                        return s;
+                    },
+                    gotoScanUrl: function () {
+                        window.open(window.SCAN_URL + '/address/' + this.account);
+                    },
+                    formatBN: function (bn, decimals) {
+                        let
+                            s = ethers.utils.formatUnits(bn, decimals),
+                            n = s.indexOf('.');
+                        if (n == (-1)) {
+                            s = s + '.' + '0'.repeat(decimals);
+                        } else {
+                            s = s + '0'.repeat(decimals - (s.length - n - 1));
+                        }
+                        return s;
+                    },
+                    accountChanged: function (accounts) {
+                        console.log('wallet account changed:', accounts.length === 0 ? null : accounts[0]);
+                        if (accounts.length === 0) {
+                            this.disconnected();
+                        } else {
+                            this.account = accounts[0];
+                            document.cookie = '__account__=' + this.account + ';max-age=1296000';
+                        }
+                    },
+                    disconnected: async function () {
+                        console.warn('wallet disconnected.');
+                        this.account = null;
+                    },
+                    chainChanged: function (chainId) {
+                        console.log('wallet chainId changed: ' + chainId + ' = ' + parseInt(chainId, 16));
+                        this.chainId = parseInt(chainId, 16);
+                    },
+                    connectWallet: async function () {
+                        console.log('try connect wallet...');
+                        if (window.getWeb3Provider() === null) {
+                            console.error('there is no web3 provider.');
+                            return false;
+                        }
+                        try {
+                            this.accountChanged(await window.ethereum.request({
+                                method: 'eth_requestAccounts',
+                            }));
+                            this.chainChanged(await window.ethereum.request({
+                                method: 'eth_chainId'
+                            }));
+                            window.ethereum.on('disconnect', this.disconnected);
+                            window.ethereum.on('accountsChanged', this.accountChanged);
+                            window.ethereum.on('chainChanged', this.chainChanged);
+                        } catch (e) {
+                            console.error('could not get a wallet connection.', e);
+                            return false;
+                        }
+                        console.log('wallet connected.');
+                        return true;
+                    }
+                },
+                mounted: function () {
+                    // create transparent tile:
+                    let offscreen = createTransparentTile();
+                    this.transparentTile = offscreen.getContext('2d').getImageData(0, 0, 32, 32);
+                    this.transparentTileUrl = 'url(' + offscreen.toDataURL() + ')';
+
+                    // draw grid on gridCanvas:
+                    let
+                        x, y,
+                        size = 512,
+                        tile = size / 32,
+                        gridCanvas = document.getElementById('gridCanvas'),
+                        g = gridCanvas.getContext('2d');
+                    g.imageSmoothingEnabled = false;
+                    g.fillStyle = 'rgba(0,0,0,0)';
+                    g.fillRect(0, 0, size, size);
+
+                    g.fillStyle = 'rgba(0,0,0,0.2)';
+                    // draw lines:
+                    g.strokeStyle = '#ccc';
+                    g.lineWidth = 1;
+                    g.beginPath();
+                    for (y = 1; y < 32; y++) {
+                        g.moveTo(0, y * tile);
+                        g.lineTo(size, y * tile);
+                    }
+                    for (x = 1; x < 32; x++) {
+                        g.moveTo(x * tile, 0);
+                        g.lineTo(x * tile, size);
+                    }
+                    g.closePath();
+                    g.stroke();
+
+                    // init mouse event: 
+                    let that = this;
+                    gridCanvas.addEventListener('contextmenu', (event) => {
+                        event.preventDefault();
+                    });
+                    gridCanvas.addEventListener('mousemove', (event) => {
+                        console.log(event.offsetX, event.offsetY, event.buttons);
+                    });
+                    gridCanvas.addEventListener('mousedown', (event) => {
+                        let
+                            ox = event.offsetX,
+                            oy = event.offsetY;
+                        if (ox >= 0 && oy >= 0) {
+                            let
+                                x = (ox & 0x1ff) >> 4,
+                                y = (ox & 0x1ff) >> 4;
+                            that.setPoint(x, y);
+                        }
+                    });
+                    gridCanvas.addEventListener('mouseup', (event) => {
+                        console.log(event.offsetX, event.offsetY, event.buttons);
+                    });
+                }
+            });
+        }
+
+        $(function () {
+            init();
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="loadingLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-items-center d-flex">
+                    <h4 class="modal-title x-title" id="loadingLabel">&nbsp;</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="float-start">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="ms-5 ps-4 float-none">
+                        <p class="x-message">&nbsp;</p>
+                    </div>
+                </div>
+                <!-- <div class="modal-footer">
+                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alertModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="alertLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-items-center d-flex">
+                    <h4 class="modal-title x-title" id="alertLabel">&nbsp;</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="float-start">
+                        <i class="fs-2 text-danger fe fe-alert-triangle"></i>
+                    </div>
+                    <div class="ms-5 ps-4 float-none">
+                        <p class="x-message">&nbsp;</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="infoLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header align-items-center d-flex">
+                    <h4 class="modal-title x-title" id="infoLabel">&nbsp;</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="float-start">
+                        <i class="fs-2 fe fe-info"></i>
+                    </div>
+                    <div class="ms-5 ps-4 float-none">
+                        <p class="x-message">&nbsp;</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="vm" class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom"
+            style="position:fixed; top:0; left:0; right:0; z-index: 99;">
+            <div class="container">
+                <a class="navbar-brand" href="#0"><i class="bi bi-envelope-paper"></i> 1024 Pixels</a>
+                <ul id="wallet" class="mr-2 navbar-nav navbar-right-wrap" style="flex-direction: row !important;">
+                    <li class="nav-item">
+                        <span class="nav-link"><i class="bi bi-globe"></i>
+                            <span v-text="networkName"></span></span>
+                    </li>
+                    <li v-if="account===null" class="nav-item">
+                        <button v-on:click="connectWallet" type="button" class="btn btn-primary">Connect Wallet</button>
+                    </li>
+                    <li v-if="account!==null" class="nav-item">
+                        <a href="#0" class="nav-link" v-on:click="gotoScanUrl"><i class="bi bi-wallet"></i>
+                            <span v-text="abbrAddress(account)"></span> <i class="fe fe-external-link"></i></a>
+                    </li>
+                    <li v-if="wrongNetwork" class="ms-2 d-inline-block">
+                        <span class="nav-link">Unsupported chain (<span v-text="chainId"></span>)</span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div style="padding-top: 80px;">
+            <div class="row">
+                <div class="col">
+                    <div class="x-border">
+                        <h5>Introduction</h5>
+                        <p>The Red Packet is an Ethereum contract that support distribute bonus with lucky.
+                            A lucky guy who want to get the bonus must know the password that is set by creator.
+                            It uses zk-proof to make all things safe. Supported chains:</p>
+                        <p id="mainnetList"></p>
+                        <p id="testnetList"></p>
+                        <p>Make sure you have tested on testnet before use the mainnet.
+                            (e.g. test with
+                            <a href="https://blockscan.com/address/0xBBB02DE94E1Dd1E99b43458027f31aBb2d75659B"
+                                target="_blank">tWBTC <i class="bi bi-box-arrow-up-right"></i></a>
+                            ,
+                            <a href="https://blockscan.com/address/0xEEE0C84193E02E67164b9b4402e47ef9CffA5b09"
+                                target="_blank">tWETH <i class="bi bi-box-arrow-up-right"></i></a>
+                            ,
+                            <a href="https://blockscan.com/address/0xDDD076E315e288a7146E8c8612a57Baae4Df21C7"
+                                target="_blank">tUSD <i class="bi bi-box-arrow-up-right"></i></a>
+                            . Use faucet() to get test token.)
+                        </p>
+                    </div>
+
+                    <canvas id="canvas-32x32" width="32" height="32"></canvas>
+                </div>
+            </div>
+
+            <!-- pixel art -->
+            <div class="row mt-4">
+                <div class="col">
+                    <div class="container" style="width:760px;">
+                        <div class="row g-0">
+                            <div class="col-2">
+                                <!-- toolbar -->
+                                <div class="toolbar">
+                                    <div v-for="b in toolbar" v-on:click="toolbarButtonClick(b.key)"
+                                        v-bind:title="b.title" class="btn"
+                                        v-bind:class="{'btn-secondary':b===pressedButton,'btn-outline-secondary':b!==pressedButton}">
+                                        <i v-bind:class="'bi bi-' + b.icon"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" col-10">
+                                <!-- canvas -->
+                                <div class="canvas">
+                                    <canvas id="mainCanvas" width="512" height="512"></canvas>
+                                    <canvas id="gridCanvas" width="512" height="512"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-0 mt-4">
+                            <div class="col-2">
+                                <!-- fg / bg color -->
+                                <div class="selected-colors">
+                                    <div class="bg-color" v-bind:class="{'transparent':bgIndex===transparentIndex}"
+                                        v-bind:style="{'background-color':indexColor(bgIndex)}"></div>
+                                    <div class="fg-color" v-bind:class="{'transparent':fgIndex===transparentIndex}"
+                                        v-bind:style="{'background-color':indexColor(fgIndex)}"></div>
+                                    <a v-on:click="switchColor" href="#0" class="switch-color"><i
+                                            class="bi bi-arrow-left-right"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-10">
+                                <!-- palette -->
+                                <div class="palette">
+                                    <div v-for="colors in palette">
+                                        <div v-for="color in colors" class="color" v-bind:index="color"
+                                            v-on:click="selectColor(color, false)"
+                                            v-on:contextmenu.prevent="selectColor(color, true)"
+                                            v-bind:style="{'background-color':fixedIndexColor(color),'background-image':color===transparentIndex?transparentTileUrl:'none'}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="p-5 mt-5 bg-light border-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="mb-4"><i class="bi bi-envelope-paper"></i> Red Packet, copyleft 2023</div>
+                    <img src="test.gif" style="width:192px;height:192px;image-rendering:pixelated">
+                    <img src="46x46-uncompressed.gif" style="width:192px;height:192px;image-rendering:pixelated">
+                    <ul class="list-unstyled small text-muted">
+                        <li class="mb-2">Designed and built by
+                            <a target="_blank" href="https://github.com/michaelliao">Michael Liao
+                                <i class="bi bi-box-arrow-up-right"></i></a>.
+                        </li>
+                        <li class="mb-2">Check the source code on
+                            <a target="_blank" href="https://github.com/michaelliao/red-packet-contract">Github
+                                <i class="bi bi-box-arrow-up-right"></i></a>
+                        </li>
+                        <li class="mb-2">Code licensed
+                            <a target="_blank"
+                                href="https://github.com/michaelliao/red-packet-contract/blob/master/LICENSE">GPLv3
+                                <i class="bi bi-box-arrow-up-right"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
