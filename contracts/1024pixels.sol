@@ -52,15 +52,16 @@ contract PixelArt is ERC721, Ownable {
             GIF_START_6,
             GIF_START_7
         );
+        bytes memory lines = abi.encodePacked("");
         for (i = 0; i < 1024; i += 32) {
             x = 0;
             for (j = 0; j < 32; j++) {
                 x = x << 8;
                 x = x | uint8(data[i + j]);
             }
-            gif = abi.encodePacked(gif, GIF_PIXEL_PREFIX, x);
+            lines = abi.encodePacked(lines, GIF_PIXEL_PREFIX, x);
         }
-        gif = abi.encodePacked(gif, GIF_END);
+        gif = abi.encodePacked(gif, lines, GIF_END);
         return
             string(
                 abi.encodePacked("data:image/gif;base64,", Base64.encode(gif))
