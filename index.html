@@ -89,7 +89,7 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
             width: 24px;
             height: 24px;
-            margin: 0 10px 10px 0;
+            margin: 0 10px 15px 0;
         }
 
         div.palette div.color:hover {
@@ -98,8 +98,17 @@
             transition: all 0.1s;
         }
 
+        div.preview {}
+
+        div.preview img {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 162px;
+            height: 162px;
+            image-rendering: pixelated;
+        }
+
         div.preview button {
-            width: 160px;
+            width: 162px;
         }
 
         a {
@@ -343,6 +352,8 @@
                 data: {
                     account: null,
                     chainId: 0,
+                    undoList: [],
+                    redoList: [],
                     toolbar: toolbar,
                     buttons: buttons,
                     canvas: null,
@@ -379,12 +390,20 @@
                 methods: {
                     isDisabled: function (key) {
                         if (key === 'undo') {
-                            return false;
+                            return this.undoList.length === 0;
                         }
                         if (key === 'redo') {
-                            return true;
+                            return this.redoList.length === 0;
                         }
                         return false;
+                    },
+                    createSnapshot: function () {
+                        return this.canvasIndexes.slice(0, 1024);
+                    },
+                    createUndo: function () {
+                        let snapshot = this.createSnapshot();
+                        this.undoList.push(snapshot);
+                        this.redoList = [];
                     },
                     pasteImage: async function () {
                         if (navigator.clipboard) {
@@ -406,6 +425,7 @@
                                         g.drawImage(img, 0, 0, img.width, img.height, 0, 0, 32, 32);
                                         let iData = g.getImageData(0, 0, 32, 32);
                                         console.log(iData.data);
+                                        that.createUndo();
                                         // find rgba:
                                         let
                                             data = iData.data,
@@ -420,6 +440,7 @@
                                             that.canvasIndexes[i / 4] = matchedIndex;
                                         }
                                         that.drawCanvas();
+                                        that.version++;
                                     }
                                     img.src = URL.createObjectURL(blob);
                                     foundImage = true;
@@ -455,6 +476,16 @@
                             let key = btn.key;
                             if (key === 'paste') {
                                 this.pasteImage();
+                            } else if (key === 'undo') {
+                                let current = this.createSnapshot();
+                                this.redoList.push(current);
+                                this.canvasIndexes = this.undoList.pop();
+                                this.drawCanvas();
+                            } else if (key === 'redo') {
+                                let current = this.createSnapshot();
+                                this.undoList.push(current);
+                                this.canvasIndexes = this.redoList.pop();
+                                this.drawCanvas();
                             }
                         }
                     },
@@ -499,15 +530,22 @@
                         }
                     },
                     setPoint: function (x, y, isRight) {
-                        this.version++;
                         let key = this.pressedButton ? this.pressedButton.key : '';
                         console.log(`${key}: ${x}, ${y}`);
                         if (key === 'pencil') {
-                            this.canvasIndexes[y * 32 + x] = isRight ? this.bgIndex : this.fgIndex;
-                            this.drawPoint(x, y);
+                            let
+                                oldColor = this.canvasIndexes[y * 32 + x],
+                                newColor = isRight ? this.bgIndex : this.fgIndex;
+                            if (oldColor !== newColor) {
+                                this.createUndo();
+                                this.canvasIndexes[y * 32 + x] = newColor;
+                                this.drawPoint(x, y);
+                                this.version++;
+                            }
                         } else if (key === 'eraser') {
                             this.canvasIndexes[y * 32 + x] = this.bgIndex;
                             this.drawPoint(x, y);
+                            this.version++;
                         } else if (key === 'pick') {
                             if (isRight) {
                                 this.bgIndex = this.canvasIndexes[y * 32 + x];
@@ -518,8 +556,12 @@
                             let
                                 fromColorIndex = this.canvasIndexes[y * 32 + x],
                                 toColorIndex = isRight ? this.bgIndex : this.fgIndex;
-                            this.fillCanvas(x, y, fromColorIndex, toColorIndex, []);
-                            this.drawCanvas();
+                            if (fromColorIndex !== toColorIndex) {
+                                this.createUndo();
+                                this.fillCanvas(x, y, fromColorIndex, toColorIndex, []);
+                                this.drawCanvas();
+                                this.version++;
+                            }
                         }
                     },
                     fillCanvas: function (x, y, fromColorIndex, toColorIndex, marks) {
@@ -936,7 +978,7 @@
                         <h5>What is 1024 Pixels Art?</h5>
                         <p>The 1024 Pixels Art is NFTs that store a 32x32 pixels as GIF image stores on chain.
                             No external file is stored on any 3rd-party storage which means all 1024 Pixels Art NFT are
-                            immutable.</p>
+                            immutable. The 1024 Pixels Art NFT is free to mint.</p>
                     </div>
                 </div>
             </div>
@@ -946,7 +988,7 @@
                 <div class="col">
                     <div class="container" style="width:760px;">
                         <div class="row g-0">
-                            <div class="col-2">
+                            <div class="col-12 col-md-2 mb-2">
                                 <!-- toolbar -->
                                 <div class="toolbar">
                                     <button v-for="b in toolbar" v-on:click="toolbarButtonClick(b.key)"
@@ -957,7 +999,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class=" col-10">
+                            <div class="col-12 col-md-10">
                                 <!-- canvas -->
                                 <div class="canvas">
                                     <canvas id="mainCanvas" width="512" height="512"></canvas>
@@ -966,7 +1008,7 @@
                             </div>
                         </div>
                         <div class="row g-0 mt-4">
-                            <div class="col-2">
+                            <div class="col-3 col-md-2">
                                 <!-- fg / bg color -->
                                 <div class="selected-colors">
                                     <div class="bg-color"
@@ -979,7 +1021,7 @@
                                             class="bi bi-arrow-left-right"></i></a>
                                 </div>
                             </div>
-                            <div class="col-5">
+                            <div class="col-9 col-md-5">
                                 <!-- palette -->
                                 <div class="palette">
                                     <div v-for="colors in palette">
@@ -991,10 +1033,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-5">
+                            <div class="col-12 col-md-5">
                                 <!-- preview -->
                                 <div class="preview">
-                                    <img id="imgPreview" width="160" height="160">
+                                    <img id="imgPreview">
                                     <div class="mt-2">
                                         <button type="button" class="btn btn-outline-secondary">
                                             <i class="bi bi-download"></i> Download
@@ -1018,7 +1060,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <div class="mb-4"><i class="bi bi-envelope-paper"></i> Red Packet, copyleft 2023</div>
+                    <div class="mb-4"><i class="bi bi-envelope-paper"></i> 1024 Pixels, copyleft 2023</div>
                     <img src="test.gif" style="width:192px;height:192px;image-rendering:pixelated">
                     <img src="46x46-uncompressed.gif" style="width:192px;height:192px;image-rendering:pixelated">
                     <ul class="list-unstyled small text-muted">
