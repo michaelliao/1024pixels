@@ -17,17 +17,17 @@
     <script src="https://cdn.jsdelivr.net/npm/snarkjs@0.5.0/build/snarkjs.min.js"></script>
 
     <style>
-        div.toolbar>div.btn-outline-secondary:hover {
+        div.toolbar>button.btn-outline-secondary:hover {
             color: #6c757d;
             background-color: rgba(0, 0, 0, 0);
             border-color: #6c757d;
         }
 
-        div.toolbar div.btn {
+        div.toolbar>button.btn {
             margin: 5px;
         }
 
-        div.toolbar>div.btn:hover {
+        div.toolbar>button.btn:hover {
             box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
             transform: scale(1.1);
             transition: all 0.1s;
@@ -44,12 +44,6 @@
             position: absolute;
             top: 0;
             left: 0;
-        }
-
-        .transparent {
-            background-image: url("transparent.png");
-            background-repeat: repeat;
-            background-position: 0 0;
         }
 
         div.selected-colors {
@@ -181,10 +175,6 @@
             return matched;
         }
 
-        $(function () {
-            // TODO:
-        });
-
         function buildPalette() {
             let palette = [];
             for (let i = 0; i < 6; i++) {
@@ -200,11 +190,11 @@
         function buildCanvasIndexes() {
             let
                 defaultColor = window.INDEX_COLORS.length - 2, // white
-                canvas = [];
+                indexes = [];
             for (let i = 0; i < 32 * 32; i++) {
-                canvas.push(defaultColor);
+                indexes.push(defaultColor);
             }
-            return canvas;
+            return indexes;
         }
 
         function createTransparentTile() {
@@ -351,7 +341,7 @@
                     chainId: 0,
                     toolbar: toolbar,
                     buttons: buttons,
-                    canvas: document.getElementById('mainCanvas'),
+                    canvas: null,
                     pressedButton: null,
                     palette: buildPalette(),
                     indexTransparent: window.INDEX_COLORS.length - 1,
@@ -383,6 +373,15 @@
                     }
                 },
                 methods: {
+                    isDisabled: function (key) {
+                        if (key === 'undo') {
+                            return false;
+                        }
+                        if (key === 'redo') {
+                            return true;
+                        }
+                        return false;
+                    },
                     pasteImage: async function () {
                         if (navigator.clipboard) {
                             let contents = await navigator.clipboard.read();
@@ -393,13 +392,13 @@
                                     console.log('paste png...');
                                     const blob = await item.getType('image/png');
                                     let img = new Image();
-                                    img.width = 32;
-                                    img.height = 32;
                                     let that = this;
                                     img.onload = function () {
                                         console.log('draw canvas...');
-                                        let canvas = document.getElementById('canvas-32x32');
-                                        let g = canvas.getContext('2d');
+                                        let offscreen = document.createElement('canvas');
+                                        offscreen.width = 32;
+                                        offscreen.height = 32;
+                                        let g = offscreen.getContext('2d');
                                         g.drawImage(img, 0, 0, img.width, img.height, 0, 0, 32, 32);
                                         let iData = g.getImageData(0, 0, 32, 32);
                                         console.log(iData.data);
@@ -416,7 +415,6 @@
                                                 matchedIndex = findMatchedIndexColor(r, g, b, a);
                                             that.canvasIndexes[i / 4] = matchedIndex;
                                         }
-                                        that.version++;
                                         that.drawCanvas();
                                     }
                                     img.src = URL.createObjectURL(blob);
@@ -434,13 +432,11 @@
                         return r;
                     },
                     selectColor: function (index, isBg) {
-                        this.version++;
                         if (isBg) {
                             this.bgIndex = index;
                         } else {
                             this.fgIndex = index;
                         }
-                        console.log(`select ${isBg ? "bg" : "fg"} color: ${index} = ` + this.fixedIndexColor(index));
                     },
                     toolbarButtonClick: function (key) {
                         console.log('button clicked: ' + key);
@@ -465,10 +461,6 @@
                         this.fgIndex = bg;
                     },
                     indexColor: function (index) {
-                        this.version;
-                        return window.INDEX_COLORS[index];
-                    },
-                    fixedIndexColor: function (index) {
                         return window.INDEX_COLORS[index];
                     },
                     pointColorIndex: function (x, y) {
@@ -480,8 +472,6 @@
                     drawCanvas: function () {
                         let
                             x, y,
-                            size = 512,
-                            tile = size / 32,
                             g = this.canvas.getContext('2d');
                         g.imageSmoothingEnabled = false;
                         for (y = 0; y < 32; y++) {
@@ -492,7 +482,7 @@
                     },
                     drawPoint: function (x, y, g) {
                         let
-                            tile = 32,
+                            tile = 16,
                             index = this.canvasIndexes[y * 32 + x];
                         if (!g) {
                             g = this.canvas.getContext('2d');
@@ -504,13 +494,52 @@
                             g.putImageData(this.transparentTile, x * tile, y * tile);
                         }
                     },
-                    setPoint: function (x, y) {
+                    setPoint: function (x, y, isRight) {
                         this.version++;
                         let key = this.pressedButton ? this.pressedButton.key : '';
                         console.log(`${key}: ${x}, ${y}`);
                         if (key === 'pencil') {
-                            this.canvasIndexes[y * 32 + x] = this.fgIndex;
+                            this.canvasIndexes[y * 32 + x] = isRight ? this.bgIndex : this.fgIndex;
                             this.drawPoint(x, y);
+                        } else if (key === 'eraser') {
+                            this.canvasIndexes[y * 32 + x] = this.bgIndex;
+                            this.drawPoint(x, y);
+                        } else if (key === 'pick') {
+                            if (isRight) {
+                                this.bgIndex = this.canvasIndexes[y * 32 + x];
+                            } else {
+                                this.fgIndex = this.canvasIndexes[y * 32 + x];
+                            }
+                        } else if (key === 'fill') {
+                            let
+                                fromColorIndex = this.canvasIndexes[y * 32 + x],
+                                toColorIndex = isRight ? this.bgIndex : this.fgIndex;
+                            this.fillCanvas(x, y, fromColorIndex, toColorIndex, []);
+                            this.drawCanvas();
+                        }
+                    },
+                    fillCanvas: function (x, y, fromColorIndex, toColorIndex, marks) {
+                        // 1st: set current point:
+                        let index = y * 32 + x;
+                        if (!marks[index] && this.canvasIndexes[index] === fromColorIndex) {
+                            this.canvasIndexes[index] = toColorIndex;
+                            marks[index] = true;
+                            // check top:
+                            if (y > 0) {
+                                this.fillCanvas(x, y - 1, fromColorIndex, toColorIndex, marks);
+                            }
+                            // check left:
+                            if (x > 0) {
+                                this.fillCanvas(x - 1, y, fromColorIndex, toColorIndex, marks);
+                            }
+                            // check bottom:
+                            if (y < 31) {
+                                this.fillCanvas(x, y + 1, fromColorIndex, toColorIndex, marks);
+                            }
+                            // check right:
+                            if (x < 31) {
+                                this.fillCanvas(x + 1, y, fromColorIndex, toColorIndex, marks);
+                            }
                         }
                     },
                     createPixelArt: async function () {
@@ -725,58 +754,62 @@
                 mounted: function () {
                     // create transparent tile:
                     let offscreen = createTransparentTile();
-                    this.transparentTile = offscreen.getContext('2d').getImageData(0, 0, 32, 32);
+                    this.transparentTile = offscreen.getContext('2d').getImageData(0, 0, 16, 16);
                     this.transparentTileUrl = 'url(' + offscreen.toDataURL() + ')';
 
                     // draw grid on gridCanvas:
-                    let
-                        x, y,
-                        size = 512,
-                        tile = size / 32,
-                        gridCanvas = document.getElementById('gridCanvas'),
-                        g = gridCanvas.getContext('2d');
-                    g.imageSmoothingEnabled = false;
-                    g.fillStyle = 'rgba(0,0,0,0)';
-                    g.fillRect(0, 0, size, size);
-
-                    g.fillStyle = 'rgba(0,0,0,0.2)';
-                    // draw lines:
-                    g.strokeStyle = '#ccc';
-                    g.lineWidth = 1;
-                    g.beginPath();
-                    for (y = 1; y < 32; y++) {
-                        g.moveTo(0, y * tile);
-                        g.lineTo(size, y * tile);
-                    }
-                    for (x = 1; x < 32; x++) {
-                        g.moveTo(x * tile, 0);
-                        g.lineTo(x * tile, size);
-                    }
-                    g.closePath();
-                    g.stroke();
-
-                    // init mouse event: 
-                    let that = this;
-                    gridCanvas.addEventListener('contextmenu', (event) => {
-                        event.preventDefault();
-                    });
-                    gridCanvas.addEventListener('mousemove', (event) => {
-                        console.log(event.offsetX, event.offsetY, event.buttons);
-                    });
-                    gridCanvas.addEventListener('mousedown', (event) => {
+                    {
                         let
-                            ox = event.offsetX,
-                            oy = event.offsetY;
-                        if (ox >= 0 && oy >= 0) {
-                            let
-                                x = (ox & 0x1ff) >> 4,
-                                y = (ox & 0x1ff) >> 4;
-                            that.setPoint(x, y);
+                            x, y,
+                            size = 512,
+                            tile = size >> 5,
+                            gridCanvas = document.getElementById('gridCanvas'),
+                            g = gridCanvas.getContext('2d');
+                        g.imageSmoothingEnabled = false;
+                        g.fillStyle = 'rgba(0,0,0,0)';
+                        g.fillRect(0, 0, size, size);
+
+                        // draw lines:
+                        g.strokeStyle = 'rgba(0,0,0,0.1)';
+                        g.lineWidth = 1;
+                        g.beginPath();
+                        for (y = 1; y < 32; y++) {
+                            g.moveTo(0, y * tile);
+                            g.lineTo(size, y * tile);
                         }
-                    });
-                    gridCanvas.addEventListener('mouseup', (event) => {
-                        console.log(event.offsetX, event.offsetY, event.buttons);
-                    });
+                        for (x = 1; x < 32; x++) {
+                            g.moveTo(x * tile, 0);
+                            g.lineTo(x * tile, size);
+                        }
+                        g.closePath();
+                        g.stroke();
+
+                        // init mouse event:
+                        let that = this;
+                        gridCanvas.addEventListener('contextmenu', (event) => {
+                            event.preventDefault();
+                        });
+                        gridCanvas.addEventListener('mousemove', (event) => {
+                            console.log(event.offsetX, event.offsetY, event.buttons);
+                        });
+                        gridCanvas.addEventListener('mousedown', (event) => {
+                            let
+                                b = event.buttons,
+                                ox = event.offsetX,
+                                oy = event.offsetY;
+                            if (ox >= 0 && oy >= 0) {
+                                let
+                                    x = (ox & 0x1ff) >> 4,
+                                    y = (oy & 0x1ff) >> 4;
+                                that.setPoint(x, y, b === 2);
+                            }
+                        });
+                        gridCanvas.addEventListener('mouseup', (event) => {
+                            console.log(event.offsetX, event.offsetY, event.buttons);
+                        });
+                    }
+                    this.canvas = document.getElementById('mainCanvas');
+                    this.drawCanvas();
                 }
             });
         }
@@ -909,8 +942,6 @@
                             . Use faucet() to get test token.)
                         </p>
                     </div>
-
-                    <canvas id="canvas-32x32" width="32" height="32"></canvas>
                 </div>
             </div>
 
@@ -922,11 +953,12 @@
                             <div class="col-2">
                                 <!-- toolbar -->
                                 <div class="toolbar">
-                                    <div v-for="b in toolbar" v-on:click="toolbarButtonClick(b.key)"
-                                        v-bind:title="b.title" class="btn"
+                                    <button v-for="b in toolbar" v-on:click="toolbarButtonClick(b.key)"
+                                        v-bind:title="b.title" type="button" class="btn"
+                                        v-bind:disabled="isDisabled(b.key)"
                                         v-bind:class="{'btn-secondary':b===pressedButton,'btn-outline-secondary':b!==pressedButton}">
                                         <i v-bind:class="'bi bi-' + b.icon"></i>
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
                             <div class=" col-10">
@@ -941,24 +973,38 @@
                             <div class="col-2">
                                 <!-- fg / bg color -->
                                 <div class="selected-colors">
-                                    <div class="bg-color" v-bind:class="{'transparent':bgIndex===transparentIndex}"
-                                        v-bind:style="{'background-color':indexColor(bgIndex)}"></div>
-                                    <div class="fg-color" v-bind:class="{'transparent':fgIndex===transparentIndex}"
-                                        v-bind:style="{'background-color':indexColor(fgIndex)}"></div>
+                                    <div class="bg-color"
+                                        v-bind:style="{'background-color':indexColor(bgIndex),'background-image':bgIndex===transparentIndex?transparentTileUrl:'none'}">
+                                    </div>
+                                    <div class="fg-color"
+                                        v-bind:style="{'background-color':indexColor(fgIndex),'background-image':fgIndex===transparentIndex?transparentTileUrl:'none'}">
+                                    </div>
                                     <a v-on:click="switchColor" href="#0" class="switch-color"><i
                                             class="bi bi-arrow-left-right"></i></a>
                                 </div>
                             </div>
-                            <div class="col-10">
+                            <div class="col-6">
                                 <!-- palette -->
                                 <div class="palette">
                                     <div v-for="colors in palette">
                                         <div v-for="color in colors" class="color" v-bind:index="color"
                                             v-on:click="selectColor(color, false)"
                                             v-on:contextmenu.prevent="selectColor(color, true)"
-                                            v-bind:style="{'background-color':fixedIndexColor(color),'background-image':color===transparentIndex?transparentTileUrl:'none'}">
+                                            v-bind:style="{'background-color':indexColor(color),'background-image':color===transparentIndex?transparentTileUrl:'none'}">
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <!-- preview -->
+                                <div class="preview">
+                                    <img id="imgPreview" width="128" height="128">
+                                </div>
+                                <!-- mint -->
+                                <div class="mt-4">
+                                    <button type="button" class="btn btn-outline-primary">
+                                        Create NFT Art
+                                    </button>
                                 </div>
                             </div>
                         </div>
