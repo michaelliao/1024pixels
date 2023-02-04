@@ -101,14 +101,15 @@
         div.preview {}
 
         div.preview img {
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            width: 162px;
-            height: 162px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            width: 100px;
+            height: 100px;
             image-rendering: pixelated;
+            margin-left: 30px;
         }
 
         div.preview button {
-            width: 162px;
+            width: 160px;
         }
 
         a {
@@ -136,8 +137,7 @@
         window.CHAIN_NAME = isTestnet ? 'Polygon Testnet' : 'Polygon';
         window.SCAN_URL = isTestnet ? 'https://mumbai.polygonscan.com' : 'https://polygonscan.com';
         window.OPENSEA_URL = isTestnet ? 'https://testnets.opensea.io/assets/mumbai/' : 'https://opensea.io/assets/polygon/';
-        window.ZERO_ADDR = '0x0000000000000000000000000000000000000000';
-        window.NFT_ADDR = '0xd32724362B165cdAD53b2059341EA95D0Eb0dD4d';
+        window.NFT_ADDR = '0xCafe968Aed67fE42d44a70e824e87C91a28BEA9c';
         window.NFT_ABI = '[{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"imageURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes","name":"data","type":"bytes"}],"name":"mint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenExist","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}]';
         window.INDEX_COLORS = [
             '#ff8080', '#ffff80', '#80ff80', '#00ff80', '#80ffff', '#0080ff', '#ff80c0', '#ff80ff',
@@ -598,32 +598,31 @@
                     },
                     download: function () {
                         let
-                            GIF_PIXEL_PREFIX = '2180',
+                            GIF_PIXEL_PREFIX = '6180',
                             GIF_END = '0181003b',
                             GIF_START = '0x' +
-                                '47494638396120002000f52f00ff8080ffff8080ff8000ff8080ffff0080ffff' +
+                                '47494638396160006000f52f00ff8080ffff8080ff8000ff8080ffff0080ffff' +
                                 '80c0ff80ffff0000ffff0080ff0000ff4000ffff0080c08080c0ff00ff804040' +
                                 'ff804000ff000080800040808080ff800040ff0080800000ff80000080000080' +
                                 '400000ff0000a08000808000ff40000080400000400000404000008000004040' +
                                 '0040400080000000808000808040808080408080c0c0c0ffffff111111111111' +
                                 '1111111111111111111111111111111111111111111111111111111111111111' +
-                                '1111111111111111111111111121f9040100002f002c00000000200020000007';
+                                '1111111111111111111111111121f9040100002f002c00000000600060000007';
                         let
                             arr = this.createSnapshot(),
                             gif = GIF_START;
                         for (let y = 0; y < 32; y++) {
-                            gif += GIF_PIXEL_PREFIX;
                             let line = '';
                             for (let x = 0; x < 32; x++) {
                                 let c = arr[y * 32 + x];
-                                line = line + (c < 16 ? '0' + c.toString(16) : c.toString(16));
+                                let hex = (c < 16 ? '0' + c.toString(16) : c.toString(16));
+                                line = line + hex + hex + hex;
                             }
-                            gif += line;
+                            gif = gif + GIF_PIXEL_PREFIX + line + GIF_PIXEL_PREFIX + line + GIF_PIXEL_PREFIX + line;
                         }
                         gif += GIF_END;
                         let gifData = 'data:application/octet-stream;base64,' +
                             base64js.fromByteArray(ethers.utils.arrayify(gif));
-                        console.log(gifData);
                         let a = document.createElement('a');
                         a.href = gifData;
                         a.download = '1024pixels.gif';
@@ -743,7 +742,12 @@
                         let
                             last = val,
                             that = this;
-                        $('#imgPreview').attr('src', that.canvas.toDataURL());
+                        setTimeout(function () {
+                            if (that.version === last) {
+                                // version not changed
+                                $('#imgPreview').attr('src', that.canvas.toDataURL());
+                            }
+                        }, 1000);
                         setTimeout(function () {
                             if (that.version === last) {
                                 // version not changed

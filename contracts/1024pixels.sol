@@ -41,12 +41,69 @@ contract PixelArt is ERC721, Ownable {
             );
     }
 
+    function partOfLine(
+        bytes memory data,
+        uint256 x,
+        uint256 i,
+        uint256 jstart,
+        uint256 jend
+    ) internal pure returns (uint256) {
+        uint256 j;
+        uint8 c;
+        for (j = jstart; j < jend; j++) {
+            c = uint8(data[i + j]);
+            x = x << 8;
+            x = x | c;
+            x = x << 8;
+            x = x | c;
+            x = x << 8;
+            x = x | c;
+        }
+        return x;
+    }
+
+    function linesData(bytes memory data) internal pure returns (bytes memory) {
+        bytes memory lines = abi.encodePacked("");
+        uint256 x1;
+        uint256 x2;
+        uint256 x3;
+        uint256 i;
+        uint8 c;
+        bytes memory line;
+        for (i = 0; i < 1024; i += 32) {
+            x1 = 0;
+            x1 = partOfLine(data, x1, i, 0, 10);
+            // index of c  = 10:
+            c = uint8(data[i + 10]);
+            x1 = x1 << 8;
+            x1 = x1 | c;
+            x1 = x1 << 8;
+            x1 = x1 | c;
+
+            x2 = 0;
+            x2 = x2 << 8;
+            x2 = x2 | c;
+            x2 = partOfLine(data, x2, i, 11, 21);
+            // index of c  = 21:
+            c = uint8(data[i + 21]);
+            x2 = x2 << 8;
+            x2 = x2 | c;
+
+            x3 = 0;
+            x3 = x3 << 8;
+            x3 = x3 | c;
+            x3 = x3 << 8;
+            x3 = x3 | c;
+            x3 = partOfLine(data, x3, i, 22, 32);
+            line = abi.encodePacked(GIF_PIXEL_PREFIX, x1, x2, x3);
+            lines = abi.encodePacked(lines, line, line, line);
+        }
+        return lines;
+    }
+
     function imageURI(uint256 tokenId) public view returns (string memory) {
         _requireMinted(tokenId);
         bytes memory data = pixels[tokenId];
-        uint256 i;
-        uint256 j;
-        uint256 x;
         bytes memory gif = abi.encodePacked(
             GIF_START_1,
             GIF_START_2,
@@ -56,16 +113,8 @@ contract PixelArt is ERC721, Ownable {
             GIF_START_6,
             GIF_START_7
         );
-        bytes memory lines = abi.encodePacked("");
-        for (i = 0; i < 1024; i += 32) {
-            x = 0;
-            for (j = 0; j < 32; j++) {
-                x = x << 8;
-                x = x | uint8(data[i + j]);
-            }
-            lines = abi.encodePacked(lines, GIF_PIXEL_PREFIX, x);
-        }
-        gif = abi.encodePacked(gif, lines, GIF_END);
+
+        gif = abi.encodePacked(gif, linesData(data), GIF_END);
         return
             string(
                 abi.encodePacked("data:image/gif;base64,", Base64.encode(gif))
@@ -84,7 +133,7 @@ contract PixelArt is ERC721, Ownable {
     }
 
     bytes32 constant GIF_START_1 =
-        0x47494638396120002000f52f00ff8080ffff8080ff8000ff8080ffff0080ffff;
+        0x47494638396160006000f52f00ff8080ffff8080ff8000ff8080ffff0080ffff;
     bytes32 constant GIF_START_2 =
         0x80c0ff80ffff0000ffff0080ff0000ff4000ffff0080c08080c0ff00ff804040;
     bytes32 constant GIF_START_3 =
@@ -96,9 +145,9 @@ contract PixelArt is ERC721, Ownable {
     bytes32 constant GIF_START_6 =
         0x1111111111111111111111111111111111111111111111111111111111111111;
     bytes32 constant GIF_START_7 =
-        0x1111111111111111111111111121f9040100002f002c00000000200020000007;
+        0x1111111111111111111111111121f9040100002f002c00000000600060000007;
 
-    bytes2 constant GIF_PIXEL_PREFIX = 0x2180;
+    bytes2 constant GIF_PIXEL_PREFIX = 0x6180;
 
     bytes4 constant GIF_END = 0x0181003b;
 }

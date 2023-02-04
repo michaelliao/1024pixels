@@ -10,6 +10,8 @@ def load_palette():
 
 PALETTE = load_palette()
 
+SCALE = 3
+
 WIDTH = 32
 HEIGHT = 32
 CODE_WIDTH = 7
@@ -21,14 +23,13 @@ random.seed(12345)
 
 def line(h):
     if h >=20 and h <=24:
-        tp = struct.pack('B', BG_COLOR) * 32
-        print('>', tp.hex())
-        return tp
+        b = struct.pack('B', BG_COLOR)
+        return b * SCALE * 32
     bs = b''
-    upper = 5 #len(PALETTE)
+    upper = 5 # len(PALETTE) - 1
     for i in range(WIDTH):
-        bs = bs + struct.pack('B', random.randint(0, upper))
-    print('>', bs.hex())
+        r = struct.pack('B', random.randint(0, upper))
+        bs = bs + r * SCALE
     return bs
 
 def to_hex(bs):
@@ -48,7 +49,7 @@ def gen_gif():
             h = '0' + h
         print(f'#{h}')
     header = b'GIF89a'
-    size = struct.pack('<hh', WIDTH, HEIGHT)
+    size = struct.pack('<hh', WIDTH * SCALE, HEIGHT * SCALE)
     gct = 0xf5 # 64 colors
     ratio = 0x00 # aspect ratio
     end = b'\x01\x81\x00\x3b'
@@ -68,14 +69,17 @@ def gen_gif():
     # graphic-control-extension, label, size, flag, delay-time, transparent-color-index, end:
     buffer = buffer + struct.pack('<BBBBhBB', 0x21, 0xf9, 4, 0x01, 0, BG_COLOR, 0)
     # image-descriptor, x, y, width, height, local-color-table, LZW-min-code-size:
-    buffer = buffer + struct.pack('<BhhhhBB', 0x2c, 0, 0, WIDTH, HEIGHT, 0, CODE_WIDTH)
-    print('hex prefix:')
+    buffer = buffer + struct.pack('<BhhhhBB', 0x2c, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, 0, CODE_WIDTH)
+    print('hex start:')
     print(to_hex(buffer))
 
     # 32x32 pixel data:
-    prefix = struct.pack('BB', WIDTH + 1, CODE_CLEAR)
+    prefix = struct.pack('BB', WIDTH * SCALE + 1, CODE_CLEAR)
+    print('hex prefix:')
+    print(to_hex(prefix))
     for h in range(HEIGHT):
-        buffer = buffer + prefix + line(h)
+        l = line(h)
+        buffer = buffer + (prefix + l) * SCALE
     buffer = buffer + end
     return buffer
 
