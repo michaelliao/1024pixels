@@ -14,6 +14,10 @@ contract PixelArt is ERC721, Ownable {
         ERC721(name, symbol)
     {}
 
+    function tokenExist(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
+    }
+
     function tokenURI(uint256 tokenId)
         public
         view
