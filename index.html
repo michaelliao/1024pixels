@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.0.32/dist/ethers.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/snarkjs@0.5.0/build/snarkjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/base64-js@1.5.1/base64js.min.js"></script>
 
     <style>
         div.toolbar>button.btn-outline-secondary:hover {
@@ -131,16 +131,14 @@
             }
         }
 
-        window.CHAIN_ID = 137;
-        window.CHAIN_NAME = 'Polygon';
-        window.SCAN_URL = 'https://polygonscan.com';
+        const isTestnet = location.hostname === 'localhost';
+        window.CHAIN_ID = isTestnet ? 80001 : 137;
+        window.CHAIN_NAME = isTestnet ? 'Polygon Testnet' : 'Polygon';
+        window.SCAN_URL = isTestnet ? 'https://mumbai.polygonscan.com' : 'https://polygonscan.com';
+        window.OPENSEA_URL = isTestnet ? 'https://testnets.opensea.io/assets/mumbai/' : 'https://opensea.io/assets/polygon/';
         window.ZERO_ADDR = '0x0000000000000000000000000000000000000000';
-        window.ETH_ADDR = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
-        window.NFT_ADDR = '0xFe6667986f58F2F7ed1e7C17Cee3951d8ABb717f';
-        window.NFT_ABI = '[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"redPacketId","type":"uint256"},{"indexed":true,"internalType":"address","name":"creator","type":"address"},{"indexed":true,"internalType":"address","name":"token","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"uint32","name":"total","type":"uint32"},{"indexed":false,"internalType":"enum RedPacket.BonusType","name":"bonusType","type":"uint8"}],"name":"Create","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"redPacketId","type":"uint256"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"address","name":"token","type":"address"},{"indexed":false,"internalType":"uint256","name":"bonus","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"bonusLeft","type":"uint256"},{"indexed":false,"internalType":"uint32","name":"totalLeft","type":"uint32"}],"name":"Withdraw","type":"event"},{"inputs":[{"internalType":"address","name":"token","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint32","name":"total","type":"uint32"},{"internalType":"enum RedPacket.BonusType","name":"bonusType","type":"uint8"},{"internalType":"uint256","name":"passcodeHash","type":"uint256"},{"internalType":"address","name":"condition","type":"address"}],"name":"create","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"getRedPacket","outputs":[{"components":[{"internalType":"uint256","name":"passcodeHash","type":"uint256"},{"internalType":"uint256","name":"amount","type":"uint256"},{"internalType":"uint256","name":"amountLeft","type":"uint256"},{"internalType":"address","name":"creator","type":"address"},{"internalType":"address","name":"token","type":"address"},{"internalType":"address","name":"condition","type":"address"},{"internalType":"uint32","name":"total","type":"uint32"},{"internalType":"uint32","name":"totalLeft","type":"uint32"},{"internalType":"enum RedPacket.BonusType","name":"bonusType","type":"uint8"}],"internalType":"struct RedPacket.RedPacketInfo","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"address","name":"addr","type":"address"}],"name":"isOpened","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"uint256[]","name":"proof","type":"uint256[]"}],"name":"open","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256[2]","name":"a","type":"uint256[2]"},{"internalType":"uint256[2][2]","name":"b","type":"uint256[2][2]"},{"internalType":"uint256[2]","name":"c","type":"uint256[2]"},{"internalType":"uint256[2]","name":"input","type":"uint256[2]"}],"name":"verifyProof","outputs":[{"internalType":"bool","name":"r","type":"bool"}],"stateMutability":"view","type":"function"}]';
-        window.ERC20_ABI = '[{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"}]';
-        window.TRANSFER_TOPIC = '0xf526b6d6ff0fac13f7e16aeea0f08bc8f0789c188dc429de0ea4b56bc06e82c6';
-        window.TRANSPARENT_COLOR = '#111111';
+        window.NFT_ADDR = '0xd32724362B165cdAD53b2059341EA95D0Eb0dD4d';
+        window.NFT_ABI = '[{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"imageURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes","name":"data","type":"bytes"}],"name":"mint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenExist","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}]';
         window.INDEX_COLORS = [
             '#ff8080', '#ffff80', '#80ff80', '#00ff80', '#80ffff', '#0080ff', '#ff80c0', '#ff80ff',
             '#ff0000', '#ffff00', '#80ff00', '#00ff40', '#00ffff', '#0080c0', '#8080c0', '#ff00ff',
@@ -372,7 +370,7 @@
                         return window.INDEX_COLORS.length - 1;
                     },
                     ready: function () {
-                        return this.account && this.chainId > 0;
+                        return this.account && this.chainId === window.CHAIN_ID;
                     },
                     networkName: function () {
                         if (this.account) {
@@ -384,7 +382,7 @@
                         return 'Not connected';
                     },
                     wrongNetwork: function () {
-                        return this.account && this.chainId !== window.CHAIN_ID;
+                        return this.chainId !== window.CHAIN_ID;
                     }
                 },
                 methods: {
@@ -481,11 +479,13 @@
                                 this.redoList.push(current);
                                 this.canvasIndexes = this.undoList.pop();
                                 this.drawCanvas();
+                                this.version++;
                             } else if (key === 'redo') {
                                 let current = this.createSnapshot();
                                 this.undoList.push(current);
                                 this.canvasIndexes = this.redoList.pop();
                                 this.drawCanvas();
+                                this.version++;
                             }
                         }
                     },
@@ -530,31 +530,39 @@
                         }
                     },
                     setPoint: function (x, y, isRight) {
-                        let key = this.pressedButton ? this.pressedButton.key : '';
+                        let
+                            index = y * 32 + x,
+                            key = this.pressedButton ? this.pressedButton.key : '';
                         console.log(`${key}: ${x}, ${y}`);
                         if (key === 'pencil') {
                             let
-                                oldColor = this.canvasIndexes[y * 32 + x],
+                                oldColor = this.canvasIndexes[index],
                                 newColor = isRight ? this.bgIndex : this.fgIndex;
                             if (oldColor !== newColor) {
                                 this.createUndo();
-                                this.canvasIndexes[y * 32 + x] = newColor;
+                                this.canvasIndexes[index] = newColor;
                                 this.drawPoint(x, y);
                                 this.version++;
                             }
                         } else if (key === 'eraser') {
-                            this.canvasIndexes[y * 32 + x] = this.bgIndex;
-                            this.drawPoint(x, y);
-                            this.version++;
+                            let
+                                oldColor = this.canvasIndexes[index],
+                                newColor = this.bgIndex;
+                            if (oldColor !== newColor) {
+                                this.createUndo();
+                                this.canvasIndexes[index] = newColor;
+                                this.drawPoint(x, y);
+                                this.version++;
+                            }
                         } else if (key === 'pick') {
                             if (isRight) {
-                                this.bgIndex = this.canvasIndexes[y * 32 + x];
+                                this.bgIndex = this.canvasIndexes[index];
                             } else {
-                                this.fgIndex = this.canvasIndexes[y * 32 + x];
+                                this.fgIndex = this.canvasIndexes[index];
                             }
                         } else if (key === 'fill') {
                             let
-                                fromColorIndex = this.canvasIndexes[y * 32 + x],
+                                fromColorIndex = this.canvasIndexes[index],
                                 toColorIndex = isRight ? this.bgIndex : this.fgIndex;
                             if (fromColorIndex !== toColorIndex) {
                                 this.createUndo();
@@ -588,144 +596,69 @@
                             }
                         }
                     },
-                    createPixelArt: async function () {
-                        // check:
+                    download: function () {
                         let
-                            chainId = this.chainId,
-                            tokenAddress,
-                            tokenAmount,
-                            decimals,
-                            total,
-                            bonusType,
-                            password,
-                            account,
-                            passcode,
-                            passcodeHash,
-                            conditionAddress = window.ZERO_ADDR,
-                            value,
-                            redPacketId = 0;
+                            GIF_PIXEL_PREFIX = '2180',
+                            GIF_END = '0181003b',
+                            GIF_START = '0x' +
+                                '47494638396120002000f52f00ff8080ffff8080ff8000ff8080ffff0080ffff' +
+                                '80c0ff80ffff0000ffff0080ff0000ff4000ffff0080c08080c0ff00ff804040' +
+                                'ff804000ff000080800040808080ff800040ff0080800000ff80000080000080' +
+                                '400000ff0000a08000808000ff40000080400000400000404000008000004040' +
+                                '0040400080000000808000808040808080408080c0c0c0ffffff111111111111' +
+                                '1111111111111111111111111111111111111111111111111111111111111111' +
+                                '1111111111111111111111111121f9040100002f002c00000000200020000007';
+                        let
+                            arr = this.createSnapshot(),
+                            gif = GIF_START;
+                        for (let y = 0; y < 32; y++) {
+                            gif += GIF_PIXEL_PREFIX;
+                            let line = '';
+                            for (let x = 0; x < 32; x++) {
+                                let c = arr[y * 32 + x];
+                                line = line + (c < 16 ? '0' + c.toString(16) : c.toString(16));
+                            }
+                            gif += line;
+                        }
+                        gif += GIF_END;
+                        let gifData = 'data:application/octet-stream;base64,' +
+                            base64js.fromByteArray(ethers.utils.arrayify(gif));
+                        console.log(gifData);
+                        let a = document.createElement('a');
+                        a.href = gifData;
+                        a.download = '1024pixels.gif';
+                        a.click();
+                    },
+                    createNFT: async function () {
                         if (!this.ready) {
-                            return showAlert('Error', 'Please connect to wallet first!');
+                            return showAlert('Error', 'Please connect to wallet with ' + window.CHAIN_NAME + ' !');
                         }
-                        if (this.wrongNetwork) {
-                            return showAlert('Error', 'The connected network is not supported!');
-                        }
-                        // important: account must be lowercase:
-                        account = this.account.toLowerCase();
-                        if (this.tokenType === 'ETH') {
-                            tokenAddress = window.ETH_ADDR;
-                            decimals = 18;
-                        } else {
-                            if (!isValidAddress(this.tokenAddress)) {
-                                return showAlert('Error', 'Token address is invalid!');
-                            }
-                            tokenAddress = this.tokenAddress;
-                            let
-                                loading1 = showLoading('Get ERC Token', 'Get ERC token information...'),
-                                erc1 = new ethers.Contract(tokenAddress, window.ERC20_ABI, window.getWeb3Provider().getSigner());
-                            try {
-                                decimals = await erc1.decimals();
-                                loading1.close();
-                                console.log('got erc ' + tokenAddress + ' decimals = ' + decimals + ' type = ' + typeof (decimals));
-                            }
-                            catch (err) {
-                                loading1.close();
-                                return showAlert('Error', 'Failed to get decimals of token: ' + translateError(err));
-                            }
-                        }
-                        // check tokenAmount:
-                        if (!isValidBN(this.tokenAmount, decimals)) {
-                            return showAlert('Error', 'Bonus amount is invalid!');
-                        }
-                        tokenAmount = toBN(this.tokenAmount, decimals);
-                        total = parseInt(this.total);
-                        if (isNaN(total) || total < 0 || total > 100000) {
-                            return showAlert('Error', 'Max perticipates is invalid!');
-                        }
-                        bonusType = parseInt(this.bonusType);
-                        // check password:
-                        password = this.password.trim();
-                        if (password === '') {
-                            return showAlert('Error', 'Password must be set!');
-                        }
-
-                        // now generate password hash:
-                        passcode = ethers.BigNumber.from(keccak(account + password));
-                        let { proof, publicSignals } = await prove(ethers.BigNumber.from('0'), passcode);
-                        console.log(publicSignals);
-                        passcodeHash = ethers.BigNumber.from(publicSignals[0]);
-                        console.log('keccak(' + (account + password) + ') = ' + passcode.toHexString());
-                        console.log('passcode hash = ', passcodeHash.toHexString());
-
                         let
-                            loading = showLoading('Create', 'Check balance...'),
-                            redPacket = new ethers.Contract(window.RED_PACKET_ADDR, window.RED_PACKET_ABI, window.getWeb3Provider().getSigner());
+                            arr = this.createSnapshot(),
+                            hexData = '0x';
+                        for (let i = 0; i < 1024; i++) {
+                            let c = arr[i];
+                            hexData = hexData + (c < 16 ? '0' + c.toString(16) : c.toString(16));
+                        }
+                        let tokenId = ethers.utils.keccak256(hexData);
+                        // check token exist:
+                        let loading = showLoading('Prepare Create NFT', 'Check NFT token ID...');
                         try {
-                            if (tokenAddress === window.ETH_ADDR) {
-                                let eth_balance = await window.getWeb3Provider().getBalance(account);
-                                if (eth_balance.lt(tokenAmount)) {
-                                    throw 'You don\'t have enough ' + this.nativeToken + '.';
-                                }
-                            } else {
-                                let
-                                    erc = new ethers.Contract(tokenAddress, window.ERC20_ABI, window.getWeb3Provider().getSigner()),
-                                    erc_symbol = await erc.symbol(),
-                                    erc_balance = await erc.balanceOf(account);
-                                if (erc_balance.lt(tokenAmount)) {
-                                    throw 'You don\'t have enough ' + erc_symbol + '.';
-                                }
-                                console.log('check allowance...');
-                                loading.setMessage('Check allowance...');
-                                let erc_allowance = await erc.allowance(account, window.RED_PACKET_ADDR);
-                                console.log('allowance = ' + erc_allowance);
-                                if (erc_allowance.lt(tokenAmount)) {
-                                    console.log('must increase allowance.');
-                                    loading.setMessage('Please approve the Red Packet contract to spend your ' + erc_symbol + ' in MetaMask...');
-                                    let tx_approve = await erc.approve(window.RED_PACKET_ADDR, ethers.utils.parseUnits('1000000000000000000', 18));
-                                    loading.setMessage('Please wait for blockchain confirmation...');
-                                    await tx_approve.wait(1);
-                                }
+                            let contract = new ethers.Contract(window.NFT_ADDR, window.NFT_ABI, window.getWeb3Provider().getSigner());
+                            let exist = await contract.tokenExist(tokenId);
+                            if (exist) {
+                                throw 'This pixels art is already minted.';
                             }
-                            loading.setMessage('Please sign transaction in MetaMask...');
-                            value = tokenAddress === window.ETH_ADDR ? tokenAmount : 0;
-                            console.log('tokenAddress = ' + tokenAddress + '\n' +
-                                'tokenAmount = ' + tokenAmount + ', type = ' + typeof (tokenAmount) + '\n' +
-                                'total = ' + total + '\n' +
-                                'bonusType = ' + bonusType + '\n' +
-                                'passcodeHash = ' + passcodeHash + '\n' +
-                                'conditionAddress = ' + conditionAddress + '\n' +
-                                'value = ' + value
-                            );
-                            let tx = await redPacket.create(
-                                tokenAddress,
-                                tokenAmount,
-                                total,
-                                bonusType,
-                                passcodeHash,
-                                conditionAddress,
-                                {
-                                    value: value
-                                }
-                            );
+                            loading.setMessage('Please sign the mint transaction in MetaMask...');
+                            let tx = await contract.mint(hexData);
                             loading.setMessage('Please wait for blockchain confirmation...');
                             await tx.wait(1);
-                            loading.setMessage('Get transaction logs...');
-                            // get red packet id from log:
-                            let receipt = await getWeb3Provider().getTransactionReceipt(tx.hash);
-                            let logs = receipt.logs;
-                            for (let i = 0; i < logs.length; i++) {
-                                let log = logs[i];
-                                if (log.topics && log.topics[0] === window.CREATE_TOPIC) {
-                                    redPacketId = parseInt(log.data.substring(0, 66), 16);
-                                    console.log('red packet id: ' + redPacketId);
-                                    break;
-                                }
-                            }
                             loading.close();
-                            let url = location.protocol + '//' + location.host + '/rp.html?chain=' + chainId + '&id=' + redPacketId;
-                            showInfo('Success', '<p>Red packet created successfully!</p><p>Password: ' +
-                                password + '</p><p>You can share this red packet:</p><p><a target="_blank" href="' +
-                                url + '">' + url + ' <i class="bi bi-box-arrow-up-right"></i></a></p>');
+                            let
+                                urlText = window.OPENSEA_URL + '0x...',
+                                url = window.OPENSEA_URL + window.NFT_ADDR + '/' + ethers.BigNumber.from(tokenId).toString();
+                            showInfo('Success', '<p>The 1024 Pixels Art was created successfully!</p><p>You should find the NFT on OpenSea shortly: </p><p><a target="_blank" href="' +
+                                url + '">' + urlText + ' <i class="bi bi-box-arrow-up-right"></i></a></p>');
                         } catch (err) {
                             loading.close();
                             return showAlert('Error', translateError(err));
@@ -795,6 +728,30 @@
                         }
                         console.log('wallet connected.');
                         return true;
+                    },
+                    switchChain: async function () {
+                        if (this.wrongNetwork) {
+                            await ethereum.request({
+                                method: 'wallet_switchEthereumChain',
+                                params: [{ chainId: '0x' + window.CHAIN_ID.toString(16) }],
+                            });
+                        }
+                    }
+                },
+                watch: {
+                    version: function (val, oldVal) {
+                        let
+                            last = val,
+                            that = this;
+                        $('#imgPreview').attr('src', that.canvas.toDataURL());
+                        setTimeout(function () {
+                            if (that.version === last) {
+                                // version not changed
+                                let data = JSON.stringify(that.createSnapshot());
+                                localStorage.setItem('image', data);
+                                console.log('image saved at version ' + last);
+                            }
+                        }, 3000);
                     }
                 },
                 mounted: function () {
@@ -854,8 +811,37 @@
                             console.log(event.offsetX, event.offsetY, event.buttons);
                         });
                     }
+                    // try load storage:
+                    let data = localStorage.getItem('image');
+                    if (data) {
+                        try {
+                            let
+                                hasError = false,
+                                arr = JSON.parse(data);
+                            if (Array.isArray(arr) && arr.length === 1024) {
+                                for (let i = 0; i < 1024; i++) {
+                                    let n = arr[i];
+                                    if (!Number.isInteger(n)) {
+                                        hasError = true;
+                                        break;
+                                    }
+                                    if (n < 0 || n >= 48) {
+                                        hasError = true;
+                                        break;
+                                    }
+                                }
+                                if (!hasError) {
+                                    this.canvasIndexes = arr;
+                                    console.log('load image from storage ok.');
+                                }
+                            }
+                        } catch (err) {
+                            console.error('failed load from storage.', err);
+                        }
+                    }
                     this.canvas = document.getElementById('mainCanvas');
                     this.drawCanvas();
+                    this.version++;
                 }
             });
         }
@@ -954,8 +940,8 @@
                 </ul>
                 <ul id="wallet" class="mr-2 navbar-nav navbar-right-wrap" style="flex-direction: row !important;">
                     <li class="nav-item">
-                        <span class="nav-link"><i class="bi bi-globe"></i>
-                            <span v-text="networkName"></span></span>
+                        <a v-on:click="switchChain" href="#0" class="nav-link"><i class="bi bi-globe"></i>
+                            <span v-text="networkName"></span></a>
                     </li>
                     <li v-if="account===null" class="nav-item">
                         <button v-on:click="connectWallet" type="button" class="btn btn-primary">Connect Wallet</button>
@@ -963,9 +949,6 @@
                     <li v-if="account!==null" class="nav-item">
                         <a href="#0" class="nav-link" v-on:click="gotoScanUrl"><i class="bi bi-wallet"></i>
                             <span v-text="abbrAddress(account)"></span> <i class="fe fe-external-link"></i></a>
-                    </li>
-                    <li v-if="wrongNetwork" class="ms-2 d-inline-block">
-                        <span class="nav-link">Unsupported chain (<span v-text="chainId"></span>)</span>
                     </li>
                 </ul>
             </div>
@@ -1011,10 +994,10 @@
                             <div class="col-3 col-md-2">
                                 <!-- fg / bg color -->
                                 <div class="selected-colors">
-                                    <div class="bg-color"
+                                    <div class="bg-color" v-bind:title="indexColor(bgIndex).toUpperCase()"
                                         v-bind:style="{'background-color':indexColor(bgIndex),'background-image':bgIndex===transparentIndex?transparentTileUrl:'none'}">
                                     </div>
-                                    <div class="fg-color"
+                                    <div class="fg-color" v-bind:title="indexColor(fgIndex).toUpperCase()"
                                         v-bind:style="{'background-color':indexColor(fgIndex),'background-image':fgIndex===transparentIndex?transparentTileUrl:'none'}">
                                     </div>
                                     <a v-on:click="switchColor" href="#0" class="switch-color"><i
@@ -1025,7 +1008,8 @@
                                 <!-- palette -->
                                 <div class="palette">
                                     <div v-for="colors in palette">
-                                        <div v-for="color in colors" class="color" v-bind:index="color"
+                                        <div v-for="color in colors" class="color"
+                                            v-bind:title="indexColor(color).toUpperCase()" v-bind:index="color"
                                             v-on:click="selectColor(color, false)"
                                             v-on:contextmenu.prevent="selectColor(color, true)"
                                             v-bind:style="{'background-color':indexColor(color),'background-image':color===transparentIndex?transparentTileUrl:'none'}">
@@ -1038,12 +1022,12 @@
                                 <div class="preview">
                                     <img id="imgPreview">
                                     <div class="mt-2">
-                                        <button type="button" class="btn btn-outline-secondary">
+                                        <button v-on:click="download" type="button" class="btn btn-outline-secondary">
                                             <i class="bi bi-download"></i> Download
                                         </button>
                                     </div>
                                     <div class="mt-2">
-                                        <button type="button" class="btn btn-primary">
+                                        <button v-on:click="createNFT" type="button" class="btn btn-primary">
                                             <i class="bi bi-image"></i> Create NFT
                                         </button>
                                     </div>
