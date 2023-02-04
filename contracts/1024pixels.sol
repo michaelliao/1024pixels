@@ -3,16 +3,145 @@
 pragma solidity =0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract PixelArt is ERC721, Ownable {
-    mapping(uint256 => bytes) internal pixels;
+contract Pixels is ERC721, Ownable, IERC2981 {
+    event Redirect(address indexed creator, address indexed redirectTo);
 
-    constructor(string memory name, string memory symbol)
-        ERC721(name, symbol)
-    {}
+    uint256 constant MAX_ROYALTY_FRACTION = 10000;
+
+    uint256 public royaltyFraction;
+    uint256 public mintFee;
+    mapping(uint256 => bytes) internal _pixels;
+    mapping(uint256 => address) internal _creators;
+    mapping(address => address) internal _creatorRedirects;
+    mapping(address => bool) internal _superOperators;
+
+    constructor(
+        string memory name,
+        string memory symbol,
+        address owner
+    ) ERC721(name, symbol) {
+        royaltyFraction = 100;
+        transferOwnership(owner);
+    }
+
+    /**
+     * Get redirect address of a creator, or address(0) if not set.
+     */
+    function creatorRedirect(address from) public view returns (address) {
+        return _creatorRedirects[from];
+    }
+
+    /**
+     * A creator can set its redirect address, or address(0) to unset.
+     */
+    function setCreatorRedirect(address to) public {
+        _creatorRedirects[msg.sender] = to;
+        emit Redirect(msg.sender, to);
+    }
+
+    /**
+     * Admin: set royalty fraction: 0 ~ 10000
+     */
+    function setRoyaltyFraction(uint256 val) public onlyOwner {
+        require(val <= MAX_ROYALTY_FRACTION, "Pixels: Out of range");
+        royaltyFraction = val;
+    }
+
+    /**
+     * Admin: set mint fee
+     */
+    function setMintFee(uint256 val) public onlyOwner {
+        mintFee = val;
+    }
+
+    /**
+     * Admin: set super operator such as OpenSea.
+     */
+    function setSuperOperator(address superOperator, bool add)
+        public
+        onlyOwner
+    {
+        _superOperators[superOperator] = add;
+    }
+
+    /**
+     * Admin: withdraw from this contract to owner.
+     */
+    function withdraw(address[] memory tokens) public onlyOwner {
+        address srcAddress = address(this);
+        for (uint256 i = 0; i < tokens.length; i++) {
+            address t = tokens[i];
+            if (t == 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE) {
+                if (srcAddress.balance > 0) {
+                    payable(msg.sender).transfer(srcAddress.balance);
+                }
+            } else {
+                IERC20 erc = IERC20(t);
+                uint256 balance = erc.balanceOf(srcAddress);
+                if (balance > 0) {
+                    SafeERC20.safeTransfer(erc, msg.sender, balance);
+                }
+            }
+        }
+    }
+
+    /**
+     * Pre-approve by safe market place such as OpenSea, LooksRare, etc.
+     */
+    function isApprovedForAll(address owner, address operator)
+        public
+        view
+        virtual
+        override
+        returns (bool)
+    {
+        if (_superOperators[operator]) {
+            return true;
+        }
+        return super.isApprovedForAll(owner, operator);
+    }
+
+    /**
+     * IERC2981: Returns how much royalty is owed and to whom, based on a sale price that may be denominated in any unit of
+     * exchange. The royalty amount is denominated and should be paid in that same unit of exchange.
+     */
+    function royaltyInfo(uint256 tokenId, uint256 salePrice)
+        external
+        view
+        returns (address receiver, uint256 royaltyAmount)
+    {
+        receiver = creatorOf(tokenId);
+        royaltyAmount = (salePrice * royaltyFraction) / 10000;
+    }
+
+    /**
+     * @dev See {IERC165-supportsInterface}.
+     */
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, IERC165)
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC2981).interfaceId ||
+            super.supportsInterface(interfaceId);
+    }
+
+    function creatorOf(uint256 tokenId) public view returns (address) {
+        address creator = _creators[tokenId];
+        require(creator != address(0), "ERC721: invalid token ID");
+        address redirect = _creatorRedirects[creator];
+        return redirect == address(0) ? creator : redirect;
+    }
 
     function tokenExist(uint256 tokenId) public view returns (bool) {
         return _exists(tokenId);
@@ -103,7 +232,7 @@ contract PixelArt is ERC721, Ownable {
 
     function imageURI(uint256 tokenId) public view returns (string memory) {
         _requireMinted(tokenId);
-        bytes memory data = pixels[tokenId];
+        bytes memory data = _pixels[tokenId];
         bytes memory gif = abi.encodePacked(
             GIF_START_1,
             GIF_START_2,
@@ -121,13 +250,15 @@ contract PixelArt is ERC721, Ownable {
             );
     }
 
-    function mint(bytes memory data) public returns (uint256) {
-        require(data.length == 1024, "invalid pixels length");
+    function mint(bytes memory data) public payable returns (uint256) {
+        require(msg.value == mintFee, "Pixels: invalid mint fee");
+        require(data.length == 1024, "Pixels: invalid pixels length");
         for (uint256 i = 0; i < 1024; i++) {
-            require(uint8(data[i]) < 48, "invalid pixel index color");
+            require(uint8(data[i]) < 48, "Pixels: invalid pixel index color");
         }
         uint256 tokenId = uint256(keccak256(data));
-        pixels[tokenId] = data;
+        _pixels[tokenId] = data;
+        _creators[tokenId] = msg.sender;
         super._safeMint(msg.sender, tokenId);
         return tokenId;
     }
