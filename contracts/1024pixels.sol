@@ -27,7 +27,7 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         string memory symbol,
         address owner
     ) ERC721(name, symbol) {
-        royaltyFraction = 100;
+        setRoyaltyFraction(500);
         transferOwnership(owner);
     }
 
@@ -136,6 +136,9 @@ contract Pixels is ERC721, Ownable, IERC2981 {
             super.supportsInterface(interfaceId);
     }
 
+    /**
+     * Creator of the token. NOTE a redirect address is returned if set by original creator.
+     */
     function creatorOf(uint256 tokenId) public view returns (address) {
         address creator = _creators[tokenId];
         require(creator != address(0), "ERC721: invalid token ID");
@@ -254,7 +257,7 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         require(msg.value == mintFee, "Pixels: invalid mint fee");
         require(data.length == 1024, "Pixels: invalid pixels length");
         for (uint256 i = 0; i < 1024; i++) {
-            require(uint8(data[i]) < 48, "Pixels: invalid pixel index color");
+            require(uint8(data[i]) < 64, "Pixels: invalid pixel index color");
         }
         uint256 tokenId = uint256(keccak256(data));
         _pixels[tokenId] = data;
@@ -264,19 +267,19 @@ contract Pixels is ERC721, Ownable, IERC2981 {
     }
 
     bytes32 constant GIF_START_1 =
-        0x47494638396160006000f52f00ff8080ffff8080ff8000ff8080ffff0080ffff;
+        0x47494638396160006000f53f00ffc0c0ffffc0c0ffc000ffc0c0ffff80c0ffc0;
     bytes32 constant GIF_START_2 =
-        0x80c0ff80ffff0000ffff0080ff0000ff4000ffff0080c08080c0ff00ff804040;
+        0xc0ffffc0ffff8080ffff8080ff8000ff8080ffff0080ffff80c0ff80ffff0000;
     bytes32 constant GIF_START_3 =
-        0xff804000ff000080800040808080ff800040ff0080800000ff80000080000080;
+        0xffff0080ff0000ff4000ffff0080c08080c0ff00ffc00000c0c00040ff4000c0;
     bytes32 constant GIF_START_4 =
-        0x400000ff0000a08000808000ff40000080400000400000404000008000004040;
+        0xc000c0ff8040c0804080ff40c0804040ff804000ff000080800040808080ff80;
     bytes32 constant GIF_START_5 =
-        0x0040400080000000808000808040808080408080c0c0c0ffffff111111111111;
+        0x0040ff0080800000ff80000080000080400000ff0000a08000808000ff400000;
     bytes32 constant GIF_START_6 =
-        0x1111111111111111111111111111111111111111111111111111111111111111;
+        0x8040000040000040400000800000404000404000800000008080008080408080;
     bytes32 constant GIF_START_7 =
-        0x1111111111111111111111111121f9040100002f002c00000000600060000007;
+        0x80408080c0c0c0ffffff11111121f9041100003f002c00000000600060000007;
 
     bytes2 constant GIF_PIXEL_PREFIX = 0x6180;
 
