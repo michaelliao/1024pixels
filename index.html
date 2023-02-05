@@ -442,7 +442,6 @@
                     pasteImage: async function () {
                         if (navigator.clipboard) {
                             let contents = await navigator.clipboard.read();
-                            console.log(contents);
                             let foundImage = false;
                             for (const item of contents) {
                                 if (item.types.includes('image/png')) {
@@ -458,7 +457,6 @@
                                         let g = offscreen.getContext('2d');
                                         g.drawImage(img, 0, 0, img.width, img.height, 0, 0, 32, 32);
                                         let iData = g.getImageData(0, 0, 32, 32);
-                                        console.log(iData.data);
                                         that.createUndo();
                                         // find rgba:
                                         let
@@ -651,7 +649,7 @@
                                 'c000c0ff8040c0804080ff40c0804040ff804000ff000080800040808080ff80' +
                                 '0040ff0080800000ff80000080000080400000ff0000a08000808000ff400000' +
                                 '8040000040000040400000800000404000404000800000008080008080408080' +
-                                '80408080c0c0c0ffffff11111121f9040100003f002c00000000600060000007';
+                                '80408080c0c0c0ffffff11111121f9041100003f002c00000000600060000007';
                         let
                             arr = this.createSnapshot(),
                             gif = GIF_START;
@@ -834,21 +832,20 @@
                         gridCanvas.addEventListener('contextmenu', (event) => {
                             event.preventDefault();
                         });
-                        gridCanvas.addEventListener('mousemove', (event) => {
-                            console.log(event.offsetX, event.offsetY, event.buttons);
-                        });
-                        gridCanvas.addEventListener('mousedown', (event) => {
+                        let mvFn = (event) => {
                             let
                                 b = event.buttons,
                                 ox = event.offsetX,
                                 oy = event.offsetY;
-                            if (ox >= 0 && oy >= 0) {
+                            if (ox >= 0 && oy >= 0 && b > 0) {
                                 let
                                     x = (ox & 0x1ff) >> 4,
                                     y = (oy & 0x1ff) >> 4;
                                 that.setPoint(x, y, b === 2);
                             }
-                        });
+                        };
+                        gridCanvas.addEventListener('mousemove', mvFn);
+                        gridCanvas.addEventListener('mousedown', mvFn);
                         gridCanvas.addEventListener('mouseup', (event) => {
                             console.log(event.offsetX, event.offsetY, event.buttons);
                         });
@@ -1007,10 +1004,12 @@
             <div class="row">
                 <div class="col">
                     <div class="x-border">
+                        <button onclick="$(this).parent().hide()" type="button" class="btn-close float-end"></button>
                         <h5>What is 1024 Pixels Art?</h5>
                         <p>1024 Pixels Art is NFTs that store a 32 x 32 = 1024 pixels as GIF image 100% stores on chain.
                             No external file is stored on any 3rd-party storage which means all 1024 Pixels Art NFT are
-                            immutable.</p>
+                            immutable. You can use professional software such as Photoshop to create, then paste and
+                            create NFT art!</p>
                     </div>
                 </div>
             </div>
