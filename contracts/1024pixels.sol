@@ -27,7 +27,7 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         string memory symbol,
         address owner
     ) ERC721(name, symbol) {
-        setRoyaltyFraction(500);
+        setRoyaltyFraction(250);
         transferOwnership(owner);
     }
 
@@ -118,7 +118,7 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         returns (address receiver, uint256 royaltyAmount)
     {
         receiver = creatorOf(tokenId);
-        royaltyAmount = (salePrice * royaltyFraction) / 10000;
+        royaltyAmount = (salePrice / 10000) * royaltyFraction;
     }
 
     /**
@@ -205,7 +205,7 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         for (i = 0; i < 1024; i += 32) {
             x1 = 0;
             x1 = partOfLine(data, x1, i, 0, 10);
-            // index of c  = 10:
+            // index of c = 10:
             c = uint8(data[i + 10]);
             x1 = x1 << 8;
             x1 = x1 | c;
@@ -216,7 +216,7 @@ contract Pixels is ERC721, Ownable, IERC2981 {
             x2 = x2 << 8;
             x2 = x2 | c;
             x2 = partOfLine(data, x2, i, 11, 21);
-            // index of c  = 21:
+            // index of c = 21:
             c = uint8(data[i + 21]);
             x2 = x2 << 8;
             x2 = x2 | c;
