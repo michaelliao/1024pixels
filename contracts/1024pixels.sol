@@ -15,8 +15,9 @@ contract Pixels is ERC721, Ownable, IERC2981 {
 
     uint256 constant MAX_ROYALTY_FRACTION = 10000;
 
-    uint256 public royaltyFraction;
-    uint256 public mintFee;
+    uint256 public royaltyFraction = 250;
+    uint256 public mintFee = 0;
+
     mapping(uint256 => bytes) internal _pixels;
     mapping(uint256 => address) internal _creators;
     mapping(address => address) internal _creatorRedirects;
@@ -27,7 +28,6 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         string memory symbol,
         address owner
     ) ERC721(name, symbol) {
-        setRoyaltyFraction(250);
         transferOwnership(owner);
     }
 
