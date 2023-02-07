@@ -4,7 +4,7 @@
     window.CHAIN_ID = isTestnet ? 80001 : 137;
     window.CHAIN_NAME = isTestnet ? 'Polygon Testnet' : 'Polygon';
     window.SCAN_URL = isTestnet ? 'https://mumbai.polygonscan.com' : 'https://polygonscan.com';
-    window.OPENSEA_URL = isTestnet ? 'https://testnets.opensea.io/assets/mumbai/' : 'https://opensea.io/assets/polygon/';
+    window.OPENSEA_URL = isTestnet ? 'https://testnets.opensea.io/assets/mumbai/' : 'https://opensea.io/assets/matic/';
     window.MARKET_URL = isTestnet ? 'https://testnets.opensea.io/collection/1024pixels-art' : 'https://opensea.io/collection/1024pixels-art';
     window.GRAPH_URL = 'https://api.thegraph.com/subgraphs/name/michaelliao/' + (isTestnet ? '1024pixels-testnet' : '1024pixels')
     window.NFT_ADDR = '0x1024Accd05Fa01AdbB74502DBDdd8e430d610c53';
