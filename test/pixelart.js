@@ -75,7 +75,7 @@ describe("1024 Pixels", function () {
             expect(await contract.creatorOf(TOKEN_ID)).to.equals(owner.address);
         });
 
-        it("Should mint failed", async function () {
+        it("Should mint failed: invalid pixels", async function () {
             const contract = await loadFixture(deployPixelsFixture);
             await expect(contract.mint('0x40' + PIXELS.substring(4))).to.be.revertedWith('Pixels: invalid pixel index color');
             await expect(contract.mint(PIXELS + '01')).to.be.revertedWith('Pixels: invalid pixels length');
@@ -92,6 +92,7 @@ describe("1024 Pixels", function () {
             await expect(contract.setMintFee(10000)).to.be.revertedWith('Ownable: caller is not the owner');
             await expect(contract.setSuperOperator('0x1234567890123456789012345678901234567890', true)).to.be.revertedWith('Ownable: caller is not the owner');
             await expect(contract.setRoyaltyFraction(200)).to.be.revertedWith('Ownable: caller is not the owner');
+            await expect(contract.withdraw(['0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'])).to.be.revertedWith('Ownable: caller is not the owner');
         });
     });
 });
