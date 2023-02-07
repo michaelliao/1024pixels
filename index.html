@@ -17,6 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.0.32/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/base64-js@1.5.1/base64js.min.js"></script>
+    <script src="static/js/pixels.js"></script>
 
     <style>
         div.autoclose {
@@ -155,43 +156,6 @@
                 this.canPressed = canPressed;
             }
         }
-
-        const isTestnet = location.hostname === 'localhost';
-        window.CHAIN_ID = isTestnet ? 80001 : 137;
-        window.CHAIN_NAME = isTestnet ? 'Polygon Testnet' : 'Polygon';
-        window.SCAN_URL = isTestnet ? 'https://mumbai.polygonscan.com' : 'https://polygonscan.com';
-        window.OPENSEA_URL = isTestnet ? 'https://testnets.opensea.io/assets/mumbai/' : 'https://opensea.io/assets/polygon/';
-        window.MARKET_URL = isTestnet ? 'https://testnets.opensea.io/' : 'https://opensea.io/';
-        window.NFT_ADDR = '0x1c3fACf04f6dFF80682B041fA3F4c241F02A492c';
-        window.NFT_ABI = '[{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"address","name":"owner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"creator","type":"address"},{"indexed":true,"internalType":"address","name":"redirectTo","type":"address"}],"name":"Redirect","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"creatorOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"}],"name":"creatorRedirect","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"imageURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes","name":"data","type":"bytes"}],"name":"mint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"mintFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"royaltyFraction","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"salePrice","type":"uint256"}],"name":"royaltyInfo","outputs":[{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"royaltyAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"setCreatorRedirect","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"val","type":"uint256"}],"name":"setMintFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"val","type":"uint256"}],"name":"setRoyaltyFraction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"superOperator","type":"address"},{"internalType":"bool","name":"add","type":"bool"}],"name":"setSuperOperator","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenExist","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"tokens","type":"address[]"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}]';
-        window.INDEX_COLORS = [
-            '#ffc0c0', '#ffffc0', '#c0ffc0', '#00ffc0', '#c0ffff', '#80c0ff', '#c0c0ff', '#ffc0ff',
-            '#ff8080', '#ffff80', '#80ff80', '#00ff80', '#80ffff', '#0080ff', '#ff80c0', '#ff80ff',
-            '#ff0000', '#ffff00', '#80ff00', '#00ff40', '#00ffff', '#0080c0', '#8080c0', '#ff00ff',
-            '#c00000', '#c0c000', '#40ff40', '#00c0c0', '#00c0ff', '#8040c0', '#804080', '#ff40c0',
-            '#804040', '#ff8040', '#00ff00', '#008080', '#004080', '#8080ff', '#800040', '#ff0080',
-            '#800000', '#ff8000', '#008000', '#008040', '#0000ff', '#0000a0', '#800080', '#8000ff',
-            '#400000', '#804000', '#004000', '#004040', '#000080', '#000040', '#400040', '#400080',
-            '#000000', '#808000', '#808040', '#808080', '#408080', '#c0c0c0', '#ffffff', 'transparent'
-        ];
-
-        function toRGB(hex) {
-            if (hex.startsWith('#')) {
-                hex = hex.substring(1);
-            }
-            let rgb = parseInt(hex, 16);
-            return [(rgb & 0xff0000) >> 16, (rgb & 0xff00) >> 8, rgb & 0xff];
-        }
-
-        function convertRgbColors() {
-            let colors = [];
-            for (let i = 0; i < window.INDEX_COLORS.length - 1 /* skip last transparent color */; i++) {
-                colors.push(toRGB(window.INDEX_COLORS[i]));
-            }
-            return colors;
-        }
-
-        window.RGB_COLORS = convertRgbColors();
 
         function findMatchedIndexColor(r, g, b, a) {
             if (a < 128) {
@@ -442,48 +406,54 @@
                     },
                     pasteImage: async function () {
                         if (navigator.clipboard) {
-                            let contents = await navigator.clipboard.read();
-                            let foundImage = false;
-                            for (const item of contents) {
-                                if (item.types.includes('image/png')) {
-                                    console.log('paste png...');
-                                    const blob = await item.getType('image/png');
-                                    let img = new Image();
-                                    let that = this;
-                                    img.onload = function () {
-                                        console.log('draw canvas...');
-                                        let offscreen = document.createElement('canvas');
-                                        offscreen.width = 32;
-                                        offscreen.height = 32;
-                                        let g = offscreen.getContext('2d');
-                                        g.drawImage(img, 0, 0, img.width, img.height, 0, 0, 32, 32);
-                                        let iData = g.getImageData(0, 0, 32, 32);
-                                        that.createUndo();
-                                        // find rgba:
-                                        let
-                                            data = iData.data,
-                                            dataLength = data.length;
-                                        for (let i = 0; i < dataLength; i += 4) {
+                            try {
+                                let contents = await navigator.clipboard.read();
+                                let foundImage = false;
+                                for (const item of contents) {
+                                    if (item.types.includes('image/png')) {
+                                        console.log('paste png...');
+                                        const blob = await item.getType('image/png');
+                                        let img = new Image();
+                                        let that = this;
+                                        img.onload = function () {
+                                            console.log('draw canvas...');
+                                            let offscreen = document.createElement('canvas');
+                                            offscreen.width = 32;
+                                            offscreen.height = 32;
+                                            let g = offscreen.getContext('2d');
+                                            g.drawImage(img, 0, 0, img.width, img.height, 0, 0, 32, 32);
+                                            let iData = g.getImageData(0, 0, 32, 32);
+                                            that.createUndo();
+                                            // find rgba:
                                             let
-                                                r = data[i],
-                                                g = data[i + 1],
-                                                b = data[i + 2],
-                                                a = data[i + 3],
-                                                matchedIndex = findMatchedIndexColor(r, g, b, a);
-                                            that.canvasIndexes[i / 4] = matchedIndex;
+                                                data = iData.data,
+                                                dataLength = data.length;
+                                            for (let i = 0; i < dataLength; i += 4) {
+                                                let
+                                                    r = data[i],
+                                                    g = data[i + 1],
+                                                    b = data[i + 2],
+                                                    a = data[i + 3],
+                                                    matchedIndex = findMatchedIndexColor(r, g, b, a);
+                                                that.canvasIndexes[i / 4] = matchedIndex;
+                                            }
+                                            that.drawCanvas();
+                                            that.version++;
+                                            showTip('Image was pasted from clipboard.');
                                         }
-                                        that.drawCanvas();
-                                        that.version++;
-                                        showTip('Image was pasted from clipboard.');
+                                        img.src = URL.createObjectURL(blob);
+                                        foundImage = true;
+                                        break;
                                     }
-                                    img.src = URL.createObjectURL(blob);
-                                    foundImage = true;
-                                    break;
                                 }
+                                if (!foundImage) {
+                                    showTip('There is no image in clipboard.', true);
+                                }
+                            } catch (err) {
+                                showTip('Your browser does not support read from clipboard.', true);
                             }
-                            if (!foundImage) {
-                                showTip('There is no image in clipboard.', true);
-                            }
+                        } else {
+                            showTip('Your browser does not support read from clipboard.', true);
                         }
                     },
                     range: function (n) {
@@ -512,8 +482,15 @@
                         } else {
                             let key = btn.key;
                             if (key === 'copy') {
-                                this.canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]));
-                                showTip('Image was copied to clipboard.');
+                                try {
+                                    if (!window.ClipboardItem) {
+                                        throw 'not support';
+                                    }
+                                    this.canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]));
+                                    showTip('Image was copied to clipboard.');
+                                } catch (err) {
+                                    showTip('Your browser does not support write to clipboard.', true);
+                                }
                             }
                             else if (key === 'paste') {
                                 this.pasteImage();
@@ -980,6 +957,10 @@
                     <li class="nav-item">
                         <a href="#0" class="nav-link active"><i class="bi bi-image"></i>
                             Create</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="list.html" class="nav-link"><i class="bi bi-list-ul"></i>
+                            Browse</span></a>
                     </li>
                     <li class="nav-item">
                         <a v-on:click="gotoMarket" href="#0" class="nav-link"><i class="bi bi-bag-heart"></i>
