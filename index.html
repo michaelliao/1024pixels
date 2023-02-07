@@ -621,16 +621,16 @@
                     },
                     download: function () {
                         let
-                            GIF_PIXEL_PREFIX = '6180',
+                            GIF_PIXEL_PREFIX = '2180',
                             GIF_END = '0181003b',
                             GIF_START = '0x' +
-                                '47494638396160006000f53f00ffc0c0ffffc0c0ffc000ffc0c0ffff80c0ffc0' +
+                                '47494638396120002000f53f00ffc0c0ffffc0c0ffc000ffc0c0ffff80c0ffc0' +
                                 'c0ffffc0ffff8080ffff8080ff8000ff8080ffff0080ffff80c0ff80ffff0000' +
                                 'ffff0080ff0000ff4000ffff0080c08080c0ff00ffc00000c0c00040ff4000c0' +
                                 'c000c0ff8040c0804080ff40c0804040ff804000ff000080800040808080ff80' +
                                 '0040ff0080800000ff80000080000080400000ff0000a08000808000ff400000' +
                                 '8040000040000040400000800000404000404000800000008080008080408080' +
-                                '80408080c0c0c0ffffff11111121f9041100003f002c00000000600060000007';
+                                '80408080c0c0c0ffffff11111121f9041100003f002c00000000200020000007';
                         let
                             arr = this.createSnapshot(),
                             gif = GIF_START;
@@ -639,9 +639,9 @@
                             for (let x = 0; x < 32; x++) {
                                 let c = arr[y * 32 + x];
                                 let hex = (c < 16 ? '0' + c.toString(16) : c.toString(16));
-                                line = line + hex + hex + hex;
+                                line = line + hex;
                             }
-                            gif = gif + GIF_PIXEL_PREFIX + line + GIF_PIXEL_PREFIX + line + GIF_PIXEL_PREFIX + line;
+                            gif = gif + GIF_PIXEL_PREFIX + line;
                         }
                         gif += GIF_END;
                         let gifData = 'data:application/octet-stream;base64,' +
