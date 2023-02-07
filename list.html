@@ -165,6 +165,9 @@
                     version: 0
                 },
                 computed: {
+                    marketUrl: function () {
+                        return window.MARKET_URL;
+                    },
                     canSetMe: function () {
                         return this.account !== null;
                     },
@@ -297,9 +300,6 @@
                     },
                     gotoScanUrl: function () {
                         window.open(window.SCAN_URL + '/address/' + this.account);
-                    },
-                    gotoMarket: function () {
-                        window.open(window.MARKET_URL);
                     },
                     accountChanged: function (accounts) {
                         console.log('wallet account changed:', accounts.length === 0 ? null : accounts[0]);
@@ -454,7 +454,7 @@
                             Browse</span></a>
                     </li>
                     <li class="nav-item">
-                        <a v-on:click="gotoMarket" href="#0" class="nav-link"><i class="bi bi-bag-heart"></i>
+                        <a v-bind:href="marketUrl" class="nav-link"><i class="bi bi-bag-heart"></i>
                             Market</span></a>
                     </li>
                 </ul>
