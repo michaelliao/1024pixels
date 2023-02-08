@@ -45,6 +45,14 @@ def to_hex(bs):
             s = s + hex(b)[2:]
     return s
 
+def print_hex(bs):
+    s = to_hex(bs)
+    while len(s) >= 64:
+        print(s[0:64])
+        s = s[64:]
+    if len(s) > 0:
+        print(s)
+
 def _check_length(bs, expected):
     if len(bs) != expected:
         print('error: unexpected length ' + len(bs) + ', expected = ' + expected)
@@ -54,7 +62,7 @@ def _check_length(bs, expected):
 def _header(w, h):
     gct = 0xf5 # 64 colors
     ratio = 0x00 # aspect ratio
-    bs = struct.pack('<6shhBBB', b'GIF89a', w, h, gct, BG_COLOR, ratio)
+    bs = struct.pack('<6sHHBBB', b'GIF89a', w, h, gct, BG_COLOR, ratio)
     return _check_length(bs, 13)
 
 def _gen_color_palette():
@@ -73,15 +81,17 @@ def _gen_color_palette():
 def _graphic_control(delayTime=0):
     # graphic-control-extension, label, size, flag, delay-time, transparent-color-index, end:
     flag = 0b0_0_010_001
-    bs = struct.pack('<BBBBhBB', 0x21, 0xf9, 4, flag, delayTime, BG_COLOR, 0)
+    bs = struct.pack('<BBBBHBB', 0x21, 0xf9, 4, flag, delayTime, BG_COLOR, 0)
+    print(f'graphics_ctrl(delay={delayTime}): ' + to_hex(bs))
     return _check_length(bs, 8)
 
 def _image_descriptor():
-    bs = struct.pack('<BhhhhBB', 0x2c, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, 0, CODE_WIDTH)
+    bs = struct.pack('<BHHHHBB', 0x2c, 0, 0, WIDTH * SCALE, HEIGHT * SCALE, 0, CODE_WIDTH)
+    print('image_desc: ' + to_hex(bs))
     return _check_length(bs, 11)
 
 def _application_extension():
-    bs = struct.pack('<BBB8s3sBBhB',
+    bs = struct.pack('<BBB8s3sBBHB',
         0x21, # extension label
         0xff, # application extension label
         0x0b, # block size
@@ -120,30 +130,16 @@ def _frame_data(data):
     bs = bs + b'\x01\x81\x00' # 01=1 byte, 81=STOP, 00=end of image data
     return _check_length(bs, (2 + 32 * SCALE) * 32 * SCALE + 3)
 
+def _end():
+    return b'\x3b'
+
 def gen_gif():
+    print('load pallete...')
     for c in PALETTE:
         h = hex(c)[2:]
         while len(h) < 6:
             h = '0' + h
         print(f'#{h}')
-
-    delayTime = 0
-
-    buffer = _header(WIDTH * SCALE, HEIGHT * SCALE)
-
-    # global PALETTE:
-    buffer = buffer + _gen_color_palette()
-
-    # buffer = buffer + _application_extension()
-
-    ########## START FRAME ##########
-
-    # graphic-control-extension, label, size, flag, delay-time, transparent-color-index, end:
-    buffer = buffer + _graphic_control(delayTime)
-
-    # image-descriptor, x, y, width, height, local-color-table, LZW-min-code-size:
-    buffer = buffer + _image_descriptor()
-    print('hex start:\n' + to_hex(buffer))
 
     str32B = 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB'
     line1 = struct.pack(str32B, *range(0, 32))
@@ -152,42 +148,41 @@ def gen_gif():
     line3 = struct.pack(str32B, *(list(range(1, 32)) + [0]))
     line4 = struct.pack(str32B, *([63] + list(range(32, 63))))
 
-    print('prefix: ' + to_hex(struct.pack('BB', WIDTH * SCALE + 1, CODE_CLEAR)))
+    frame1_data = (line1 + line2) * 16
+    frame2_data =  (line3 + line4) * 16
 
-    # 32x32 pixel data:
-    data = (line1 + line2) * 16
-    print('data:\n' + to_hex(data))
-    buffer = buffer + _frame_data(data)
+    print('frame1 data:\n' + to_hex(frame1_data))
 
-    ########## END FRAME ##########
+    # generate static gif:
 
+    single = _header(WIDTH * SCALE, HEIGHT * SCALE) \
+           + _gen_color_palette() \
+           + _application_extension() \
+           + _graphic_control(0) \
+           + _image_descriptor() \
+           + _frame_data(frame1_data) \
+           + _end()
 
+    animate = _header(WIDTH * SCALE, HEIGHT * SCALE) \
+            + _gen_color_palette() \
+            + _application_extension() \
+            + _graphic_control(100) \
+            + _image_descriptor() \
+            + _frame_data(frame1_data) \
+            + _graphic_control(100) \
+            + _image_descriptor() \
+            + _frame_data(frame2_data) \
+            + _end()
 
-    ########## START FRAME 2 ##########
+    write_gif('test/single.gif', single)
+    write_gif('test/animate.gif', animate)
 
-    # graphic-control-extension, label, size, flag, delay-time, transparent-color-index, end:
-    #buffer = buffer + _graphic_control(delayTime)
-
-    # image-descriptor, x, y, width, height, local-color-table, LZW-min-code-size:
-    #buffer = buffer + _image_descriptor()
-
-    # 32x32 pixel data:
-    #buffer = buffer + _frame_data((line3+line4)*16)
-
-    ########## END FRAME 2 ##########
-
-
-    end = b'\x3b'
-    buffer = buffer + end
-    return buffer
-
-def write_gif(data):
-    with open('test.gif', 'wb') as f:
+def write_gif(path, data):
+    with open(path, 'wb') as f:
         f.write(data)
 
 def main():
-    data = gen_gif()
-    write_gif(data)
+    gen_gif()
 
 if __name__ == '__main__':
     main()
