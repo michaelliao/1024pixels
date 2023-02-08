@@ -28,11 +28,16 @@ describe("1024 Pixels", function () {
     }
 
     async function readFileAsBase64(path) {
+        let r = await readFileAsUint8Array(path);
+        return r.toString('base64');
+    }
+
+    async function readFileAsUint8Array(path) {
         let fp;
         try {
             fp = await open(path, 'r');
             let data = await fp.read();
-            return data.buffer.subarray(0, data.bytesRead).toString('base64');
+            return data.buffer.subarray(0, data.bytesRead);
         } finally {
             fp?.close();
         }
@@ -42,11 +47,13 @@ describe("1024 Pixels", function () {
         it("Should mint ok", async function () {
             const contract = await loadFixture(deployPixelsFixture);
             await contract.mint(PIXELS);
+            let dataPixels = '0x' + '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f'.repeat(16);
             let dataImage = 'data:image/gif;base64,' + await readFileAsBase64('test/single.gif');
             let tokenIdAsDecimal = BigNumber.from(TOKEN_ID).toString();
             let dataJson = 'data:application/json;base64,' + Buffer.from(`{"name":"1024 Pixels # ${tokenIdAsDecimal}","image":"${dataImage}"}`).toString('base64');
             expect(await contract.imageURI(TOKEN_ID)).to.equals(dataImage);
             expect(await contract.tokenURI(TOKEN_ID)).to.equals(dataJson);
+            expect(await contract.imageData(TOKEN_ID)).to.equals(dataPixels);
         });
 
         it("Basic info", async function () {

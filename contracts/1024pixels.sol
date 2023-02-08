@@ -293,7 +293,6 @@ contract Pixels is AbstractPixels, IPixels {
         returns (bytes[] memory)
     {
         uint256 len = tokenIds.length;
-        require(len >= 2 && len <= 10, "Pixels: invalid token ids.");
         bytes[] memory images = new bytes[](len);
         for (uint256 i = 0; i < len; i++) {
             uint256 tokenId = tokenIds[i];
