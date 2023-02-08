@@ -10,7 +10,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-contract Pixels is ERC721, Ownable, IERC2981 {
+interface IPixels {
+    function imagesData(uint256[] memory tokenIds)
+        external
+        view
+        returns (bytes[] memory);
+}
+
+contract AbstractPixels is ERC721, Ownable, IERC2981 {
     event Redirect(address indexed creator, address indexed redirectTo);
 
     uint256 constant MAX_ROYALTY_FRACTION = 10000;
@@ -18,18 +25,13 @@ contract Pixels is ERC721, Ownable, IERC2981 {
     uint256 public royaltyFraction = 250;
     uint256 public mintFee = 0;
 
-    mapping(uint256 => bytes) internal _pixels;
     mapping(uint256 => address) internal _creators;
     mapping(address => address) internal _creatorRedirects;
     mapping(address => bool) internal _superOperators;
 
-    constructor(
-        string memory name,
-        string memory symbol,
-        address owner
-    ) ERC721(name, symbol) {
-        transferOwnership(owner);
-    }
+    constructor(string memory name, string memory symbol)
+        ERC721(name, symbol)
+    {}
 
     /**
      * Get redirect address of a creator, or address(0) if not set.
@@ -150,6 +152,44 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         return _exists(tokenId);
     }
 
+    bytes32 constant GIF_START_1 =
+        0x47494638396160006000f53f00ffc0c0ffffc0c0ffc000ffc0c0ffff80c0ffc0;
+    bytes32 constant GIF_START_2 =
+        0xc0ffffc0ffff8080ffff8080ff8000ff8080ffff0080ffff80c0ff80ffff0000;
+    bytes32 constant GIF_START_3 =
+        0xffff0080ff0000ff4000ffff0080c08080c0ff00ffc00000ffc080c0800000c0;
+    bytes32 constant GIF_START_4 =
+        0xc000c0ff8040c0804080ff40c0804040ff804000ff000080800040808080ff80;
+    bytes32 constant GIF_START_5 =
+        0x0040ff0080800000ff80000080000080400000ff0000a08000808000ff400000;
+    bytes32 constant GIF_START_6 =
+        0x8040000040000040400000800000404000404000800000008080008080408080;
+    bytes32 constant GIF_START_7 =
+        0x80408080c0c0c0ffffff11111121ff0b4e45545343415045322e300301000000;
+
+    bytes4 constant GIF_GRAPH_CTRL_START = 0x21f90411;
+    bytes3 constant GIF_GRAPH_CTRL_END = 0x003f00;
+
+    bytes11 constant GIF_IMAGE_DESC = 0x2c00000000600060000007;
+
+    bytes2 constant GIF_PIXEL_PREFIX = 0x6180;
+
+    bytes3 constant GIF_FRAME_END = 0x018100;
+
+    bytes1 constant GIF_END = 0x3b;
+}
+
+contract Pixels is AbstractPixels, IPixels {
+    mapping(uint256 => bytes) internal _pixels;
+
+    constructor(
+        string memory name,
+        string memory symbol,
+        address owner
+    ) AbstractPixels(name, symbol) {
+        transferOwnership(owner);
+    }
+
     function tokenURI(uint256 tokenId)
         public
         view
@@ -194,8 +234,17 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         return x;
     }
 
-    function linesData(bytes memory data) internal pure returns (bytes memory) {
-        bytes memory lines = abi.encodePacked("");
+    function frameData(bytes memory data, uint8 delay)
+        internal
+        pure
+        returns (bytes memory)
+    {
+        bytes memory lines = abi.encodePacked(
+            GIF_GRAPH_CTRL_START,
+            delay,
+            GIF_GRAPH_CTRL_END,
+            GIF_IMAGE_DESC
+        );
         uint256 x1;
         uint256 x2;
         uint256 x3;
@@ -230,12 +279,32 @@ contract Pixels is ERC721, Ownable, IERC2981 {
             line = abi.encodePacked(GIF_PIXEL_PREFIX, x1, x2, x3);
             lines = abi.encodePacked(lines, line, line, line);
         }
-        return lines;
+        return abi.encodePacked(lines, GIF_FRAME_END);
+    }
+
+    function imageData(uint256 tokenId) public view returns (bytes memory) {
+        _requireMinted(tokenId);
+        return _pixels[tokenId];
+    }
+
+    function imagesData(uint256[] memory tokenIds)
+        public
+        view
+        returns (bytes[] memory)
+    {
+        uint256 len = tokenIds.length;
+        require(len >= 2 && len <= 10, "Pixels: invalid token ids.");
+        bytes[] memory images = new bytes[](len);
+        for (uint256 i = 0; i < len; i++) {
+            uint256 tokenId = tokenIds[i];
+            _requireMinted(tokenId);
+            images[i] = _pixels[tokenId];
+        }
+        return images;
     }
 
     function imageURI(uint256 tokenId) public view returns (string memory) {
-        _requireMinted(tokenId);
-        bytes memory data = _pixels[tokenId];
+        bytes memory data = imageData(tokenId);
         bytes memory gif = abi.encodePacked(
             GIF_START_1,
             GIF_START_2,
@@ -246,7 +315,7 @@ contract Pixels is ERC721, Ownable, IERC2981 {
             GIF_START_7
         );
 
-        gif = abi.encodePacked(gif, linesData(data), GIF_END);
+        gif = abi.encodePacked(gif, frameData(data, 0), GIF_END);
         return
             string(
                 abi.encodePacked("data:image/gif;base64,", Base64.encode(gif))
@@ -265,23 +334,30 @@ contract Pixels is ERC721, Ownable, IERC2981 {
         super._safeMint(msg.sender, tokenId);
         return tokenId;
     }
+}
 
-    bytes32 constant GIF_START_1 =
-        0x47494638396160006000f53f00ffc0c0ffffc0c0ffc000ffc0c0ffff80c0ffc0;
-    bytes32 constant GIF_START_2 =
-        0xc0ffffc0ffff8080ffff8080ff8000ff8080ffff0080ffff80c0ff80ffff0000;
-    bytes32 constant GIF_START_3 =
-        0xffff0080ff0000ff4000ffff0080c08080c0ff00ffc00000c0c00040ff4000c0;
-    bytes32 constant GIF_START_4 =
-        0xc000c0ff8040c0804080ff40c0804040ff804000ff000080800040808080ff80;
-    bytes32 constant GIF_START_5 =
-        0x0040ff0080800000ff80000080000080400000ff0000a08000808000ff400000;
-    bytes32 constant GIF_START_6 =
-        0x8040000040000040400000800000404000404000800000008080008080408080;
-    bytes32 constant GIF_START_7 =
-        0x80408080c0c0c0ffffff11111121f9041100003f002c00000000600060000007;
+contract Animation is AbstractPixels {
+    IPixels immutable ipixels;
 
-    bytes2 constant GIF_PIXEL_PREFIX = 0x6180;
+    constructor(
+        string memory name,
+        string memory symbol,
+        address owner,
+        address pixelsContract
+    ) AbstractPixels(name, symbol) {
+        transferOwnership(owner);
+        ipixels = IPixels(pixelsContract);
+    }
 
-    bytes4 constant GIF_END = 0x0181003b;
+    function gifData(uint256[] memory tokenIds, uint8 interval)
+        public
+        view
+        returns (bytes memory)
+    {
+        require(
+            tokenIds.length >= 2 && tokenIds.length <= 10,
+            "Pixels: invalid token ids"
+        );
+        require(interval > 0 && interval < 10, "Pixels: invalid interval");
+    }
 }
