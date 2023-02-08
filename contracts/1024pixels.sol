@@ -11,6 +11,8 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 interface IPixels {
+    function tokenExist(uint256 tokenId) external view returns (bool);
+
     function imagesData(uint256[] memory tokenIds)
         external
         view
@@ -148,71 +150,6 @@ contract AbstractPixels is ERC721, Ownable, IERC2981 {
         return redirect == address(0) ? creator : redirect;
     }
 
-    function tokenExist(uint256 tokenId) public view returns (bool) {
-        return _exists(tokenId);
-    }
-
-    bytes32 constant GIF_START_1 =
-        0x47494638396160006000f53f00ffc0c0ffffc0c0ffc000ffc0c0ffff80c0ffc0;
-    bytes32 constant GIF_START_2 =
-        0xc0ffffc0ffff8080ffff8080ff8000ff8080ffff0080ffff80c0ff80ffff0000;
-    bytes32 constant GIF_START_3 =
-        0xffff0080ff0000ff4000ffff0080c08080c0ff00ffc00000ffc080c0800000c0;
-    bytes32 constant GIF_START_4 =
-        0xc000c0ff8040c0804080ff40c0804040ff804000ff000080800040808080ff80;
-    bytes32 constant GIF_START_5 =
-        0x0040ff0080800000ff80000080000080400000ff0000a08000808000ff400000;
-    bytes32 constant GIF_START_6 =
-        0x8040000040000040400000800000404000404000800000008080008080408080;
-    bytes32 constant GIF_START_7 =
-        0x80408080c0c0c0ffffff11111121ff0b4e45545343415045322e300301000000;
-
-    bytes4 constant GIF_GRAPH_CTRL_START = 0x21f90411;
-    bytes3 constant GIF_GRAPH_CTRL_END = 0x003f00;
-
-    bytes11 constant GIF_IMAGE_DESC = 0x2c00000000600060000007;
-
-    bytes2 constant GIF_PIXEL_PREFIX = 0x6180;
-
-    bytes3 constant GIF_FRAME_END = 0x018100;
-
-    bytes1 constant GIF_END = 0x3b;
-}
-
-contract Pixels is AbstractPixels, IPixels {
-    mapping(uint256 => bytes) internal _pixels;
-
-    constructor(
-        string memory name,
-        string memory symbol,
-        address owner
-    ) AbstractPixels(name, symbol) {
-        transferOwnership(owner);
-    }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
-        bytes memory dataURI = abi.encodePacked(
-            '{"name":"1024 Pixels # ',
-            Strings.toString(tokenId),
-            '","image":"',
-            imageURI(tokenId),
-            '"}'
-        );
-        return
-            string(
-                abi.encodePacked(
-                    "data:application/json;base64,",
-                    Base64.encode(dataURI)
-                )
-            );
-    }
-
     function partOfLine(
         bytes memory data,
         uint256 x,
@@ -282,11 +219,77 @@ contract Pixels is AbstractPixels, IPixels {
         return abi.encodePacked(lines, GIF_FRAME_END);
     }
 
+    bytes32 constant GIF_START_1 =
+        0x47494638396160006000f53f00ffc0c0ffffc0c0ffc000ffc0c0ffff80c0ffc0;
+    bytes32 constant GIF_START_2 =
+        0xc0ffffc0ffff8080ffff8080ff8000ff8080ffff0080ffff80c0ff80ffff0000;
+    bytes32 constant GIF_START_3 =
+        0xffff0080ff0000ff4000ffff0080c08080c0ff00ffc00000ffc080c0800000c0;
+    bytes32 constant GIF_START_4 =
+        0xc000c0ff8040c0804080ff40c0804040ff804000ff000080800040808080ff80;
+    bytes32 constant GIF_START_5 =
+        0x0040ff0080800000ff80000080000080400000ff0000a08000808000ff400000;
+    bytes32 constant GIF_START_6 =
+        0x8040000040000040400000800000404000404000800000008080008080408080;
+    bytes32 constant GIF_START_7 =
+        0x80408080c0c0c0ffffff11111121ff0b4e45545343415045322e300301000000;
+
+    bytes4 constant GIF_GRAPH_CTRL_START = 0x21f90411;
+    bytes3 constant GIF_GRAPH_CTRL_END = 0x003f00;
+
+    bytes11 constant GIF_IMAGE_DESC = 0x2c00000000600060000007;
+
+    bytes2 constant GIF_PIXEL_PREFIX = 0x6180;
+
+    bytes3 constant GIF_FRAME_END = 0x018100;
+
+    bytes1 constant GIF_END = 0x3b;
+}
+
+contract Pixels is AbstractPixels, IPixels {
+    mapping(uint256 => bytes) internal _pixels;
+
+    constructor(
+        string memory name,
+        string memory symbol,
+        address owner
+    ) AbstractPixels(name, symbol) {
+        transferOwnership(owner);
+    }
+
+    function tokenExist(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
+        bytes memory dataURI = abi.encodePacked(
+            '{"name":"1024 Pixels # ',
+            Strings.toString(tokenId),
+            '","image":"',
+            imageURI(tokenId),
+            '"}'
+        );
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(dataURI)
+                )
+            );
+    }
+
     function imageData(uint256 tokenId) public view returns (bytes memory) {
         _requireMinted(tokenId);
         return _pixels[tokenId];
     }
 
+    // not check tokenId exist:
     function imagesData(uint256[] memory tokenIds)
         public
         view
@@ -296,7 +299,6 @@ contract Pixels is AbstractPixels, IPixels {
         bytes[] memory images = new bytes[](len);
         for (uint256 i = 0; i < len; i++) {
             uint256 tokenId = tokenIds[i];
-            _requireMinted(tokenId);
             images[i] = _pixels[tokenId];
         }
         return images;
@@ -335,8 +337,17 @@ contract Pixels is AbstractPixels, IPixels {
     }
 }
 
-contract Animation is AbstractPixels {
+contract Animations is AbstractPixels {
     IPixels immutable ipixels;
+
+    struct AnimationInfo {
+        uint8 interval;
+        uint256[] tokenIds;
+    }
+
+    mapping(uint256 => AnimationInfo) internal _animations;
+
+    uint256 public maxFrames = 4;
 
     constructor(
         string memory name,
@@ -348,15 +359,116 @@ contract Animation is AbstractPixels {
         ipixels = IPixels(pixelsContract);
     }
 
-    function gifData(uint256[] memory tokenIds, uint8 interval)
+    function setMaxFrames(uint256 _maxFrames) public onlyOwner {
+        require(
+            _maxFrames >= 2 && _maxFrames <= 16,
+            "Animations: invalid max frames"
+        );
+        maxFrames = _maxFrames;
+    }
+
+    function tokenExist(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId)
         public
         view
-        returns (bytes memory)
+        virtual
+        override
+        returns (string memory)
     {
-        require(
-            tokenIds.length >= 2 && tokenIds.length <= 10,
-            "Pixels: invalid token ids"
+        bytes memory dataURI = abi.encodePacked(
+            '{"name":"1024 Animations # ',
+            Strings.toString(tokenId),
+            '","image":"',
+            imageURI(tokenId),
+            '"}'
         );
-        require(interval > 0 && interval < 10, "Pixels: invalid interval");
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(dataURI)
+                )
+            );
+    }
+
+    function imageURI(uint256 tokenId) public view returns (string memory) {
+        AnimationInfo memory info = imageData(tokenId);
+        uint8 interval = info.interval;
+        uint256[] memory tokenIds = info.tokenIds;
+        uint256 len = tokenIds.length;
+        bytes[] memory frames = ipixels.imagesData(tokenIds);
+        bytes memory gif = abi.encodePacked(
+            GIF_START_1,
+            GIF_START_2,
+            GIF_START_3,
+            GIF_START_4,
+            GIF_START_5,
+            GIF_START_6,
+            GIF_START_7
+        );
+        for (uint256 i = 0; i < len; i++) {
+            gif = abi.encodePacked(gif, frameData(frames[i], interval));
+        }
+        gif = abi.encodePacked(gif, GIF_END);
+        return
+            string(
+                abi.encodePacked("data:image/gif;base64,", Base64.encode(gif))
+            );
+    }
+
+    function imageData(uint256 tokenId)
+        public
+        view
+        returns (AnimationInfo memory)
+    {
+        _requireMinted(tokenId);
+        return _animations[tokenId];
+    }
+
+    function mint(uint8 interval, uint256[] memory tokenIds)
+        public
+        payable
+        returns (uint256)
+    {
+        require(msg.value == mintFee, "Animations: invalid mint fee");
+
+        require(interval > 0 && interval <= 20, "Animations: invalid interval");
+
+        uint256 len = tokenIds.length;
+        require(
+            len >= 2 && len <= maxFrames,
+            "Animations: invalid token id length"
+        );
+        uint256 first = tokenIds[0];
+        require(ipixels.tokenExist(first), "Animations: invalid token id");
+
+        bool diff = false;
+        for (uint256 i = 1; i < len; i++) {
+            require(
+                ipixels.tokenExist(tokenIds[i]),
+                "Animations: invalid token id"
+            );
+            if (first != tokenIds[i]) {
+                diff = true;
+            }
+        }
+        require(diff, "Animations: same token ids");
+
+        uint256 tokenId = uint256(
+            keccak256(abi.encodePacked(interval, tokenIds))
+        );
+
+        AnimationInfo storage info = _animations[tokenId];
+        require(info.interval == 0, "Animations: token exist");
+        info.interval = interval * 10;
+        info.tokenIds = tokenIds;
+
+        _creators[tokenId] = msg.sender;
+        super._safeMint(msg.sender, tokenId);
+
+        return tokenId;
     }
 }

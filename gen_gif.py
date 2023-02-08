@@ -174,8 +174,21 @@ def gen_gif():
             + _frame_data(frame2_data) \
             + _end()
 
+    animate4 = _header(WIDTH * SCALE, HEIGHT * SCALE) \
+            + _gen_color_palette() \
+            + _application_extension()
+    for i in range(2):
+        animate4 = animate4 + _graphic_control(40) \
+                 + _image_descriptor() \
+                 + _frame_data(frame1_data) \
+                 + _graphic_control(40) \
+                 + _image_descriptor() \
+                 + _frame_data(frame2_data)
+    animate4 = animate4 + _end()
+
     write_gif('test/single.gif', single)
     write_gif('test/animate.gif', animate)
+    write_gif('test/animate4.gif', animate4)
 
 def write_gif(path, data):
     with open(path, 'wb') as f:
