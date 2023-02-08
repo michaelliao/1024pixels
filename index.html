@@ -432,8 +432,8 @@
                                     if (item.types.includes('image/png')) {
                                         console.log('paste png...');
                                         const blob = await item.getType('image/png');
-                                        let img = new Image();
                                         let that = this;
+                                        let img = new Image();
                                         img.onload = function () {
                                             console.log('draw canvas...');
                                             let offscreen = document.createElement('canvas');
