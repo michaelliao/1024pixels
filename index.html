@@ -29,17 +29,21 @@
             z-index: 999;
         }
 
-        div.toolbar>button.btn-outline-secondary:hover {
+        div.toolbar>div {
+            text-align: center;
+        }
+
+        div.toolbar button.btn-outline-secondary:hover {
             color: #6c757d;
             background-color: rgba(0, 0, 0, 0);
             border-color: #6c757d;
         }
 
-        div.toolbar>button.btn {
+        div.toolbar button.btn {
             margin: 5px;
         }
 
-        div.toolbar>button.btn:hover {
+        div.toolbar button.btn:hover {
             box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
             transform: scale(1.1);
             transition: all 0.1s;
@@ -338,14 +342,26 @@
                 btnPencil = new ToolbarButton('pencil', 'Pencil', 'pencil', true),
                 btnLine = new ToolbarButton('line', 'Line', 'slash-lg', true),
                 btnRect = new ToolbarButton('rect', 'Rectangle', 'square', true),
+                btnMoveUp = new ToolbarButton('move_up', 'Move Up', 'arrow-up'),
+                btnMoveLeft = new ToolbarButton('move_left', 'Move Left', 'arrow-left'),
+                btnMoveRight = new ToolbarButton('move_right', 'Move Right', 'arrow-right'),
+                btnMoveDown = new ToolbarButton('move_down', 'Move Down', 'arrow-down'),
                 toolbar = [
-                    btnUndo, btnRedo,
-                    btnCopy, btnPaste,
-                    btnEraser, btnFill,
-                    btnPick, btnPencil,
-                    // btnLine, btnRect
+                    [btnUndo, btnRedo,
+                        btnCopy, btnPaste,
+                        btnEraser, btnFill,
+                        btnPick, btnPencil],
+                    // btnLine, btnRect,
+                    [btnMoveUp],
+                    [btnMoveLeft, btnMoveRight],
+                    [btnMoveDown]
                 ],
-                buttons = toolbar.reduce((btns, btn) => { btns[btn.key] = btn; return btns; }, {});
+                buttons = [];
+            for (let bgroup of toolbar) {
+                for (let btn of bgroup) {
+                    buttons[btn.key] = btn;
+                }
+            }
             window.vm = new Vue({
                 el: '#vm',
                 data: {
@@ -489,8 +505,20 @@
                                     if (!window.ClipboardItem) {
                                         throw 'not support';
                                     }
-                                    this.canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]));
-                                    showTip('Image was copied to clipboard.');
+                                    let gifData = 'data:image/gif;base64,' +
+                                        base64js.fromByteArray(this.genGIF());
+                                    let img = document.createElement('img');
+                                    img.width = 32; img.height = 32;
+                                    img.onload = function () {
+                                        let offscreen = document.createElement('canvas');
+                                        offscreen.width = 32;
+                                        offscreen.height = 32;
+                                        let g = offscreen.getContext('2d');
+                                        g.drawImage(img, 0, 0, img.width, img.height, 0, 0, 32, 32);
+                                        offscreen.toBlob(blob => navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]));
+                                        showTip('Image was copied to clipboard.');
+                                    };
+                                    img.src = gifData;
                                 } catch (err) {
                                     showTip('Your browser does not support write to clipboard.', true);
                                 }
@@ -507,6 +535,41 @@
                                 let current = this.createSnapshot();
                                 this.undoList.push(current);
                                 this.canvasIndexes = this.redoList.pop();
+                                this.drawCanvas();
+                                this.version++;
+                            } else if (key.startsWith('move_')) {
+                                this.createUndo();
+                                let
+                                    dir = key.substring(5),
+                                    current = this.createSnapshot(),
+                                    bgColor = this.bgIndex;
+                                if (dir === 'up') {
+                                    current = current.slice(32, 1024);
+                                    current = current.concat(Array(32).fill(bgColor));
+                                } else if (dir === 'down') {
+                                    current = current.slice(0, 1024 - 32);
+                                    current = Array(32).fill(bgColor).concat(current);
+                                } else {
+                                    let
+                                        fillLeft = dir === 'right',
+                                        empty = current.slice(0, 1024);
+                                    for (let y = 0; y < 32; y++) {
+                                        let offset = y * 32;
+                                        if (fillLeft) {
+                                            empty[offset] = bgColor;
+                                            for (let x = 1; x < 32; x++) {
+                                                empty[offset + x] = current[offset + x - 1];
+                                            }
+                                        } else {
+                                            empty[offset + 31] = bgColor;
+                                            for (let x = 0; x < 31; x++) {
+                                                empty[offset + x] = current[offset + x + 1];
+                                            }
+                                        }
+                                    }
+                                    current = empty;
+                                }
+                                this.canvasIndexes = current;
                                 this.drawCanvas();
                                 this.version++;
                             }
@@ -619,7 +682,7 @@
                             }
                         }
                     },
-                    download: function () {
+                    genGIF: function () {
                         let
                             GIF_PIXEL_PREFIX = '2180',
                             GIF_END = '0181003b',
@@ -644,8 +707,11 @@
                             gif = gif + GIF_PIXEL_PREFIX + line;
                         }
                         gif += GIF_END;
+                        return ethers.utils.arrayify(gif);
+                    },
+                    download: function () {
                         let gifData = 'data:application/octet-stream;base64,' +
-                            base64js.fromByteArray(ethers.utils.arrayify(gif));
+                            base64js.fromByteArray(this.genGIF());
                         let a = document.createElement('a');
                         a.href = gifData;
                         a.download = '1024pixels.gif';
@@ -1005,12 +1071,14 @@
                             <div class="col-12 col-md-2 mb-2">
                                 <!-- toolbar -->
                                 <div class="toolbar">
-                                    <button v-for="b in toolbar" type="button" class="btn"
-                                        v-on:click="toolbarButtonClick(b.key)" v-bind:id="'btn-'+b.key"
-                                        v-bind:title="b.title" v-bind:disabled="isDisabled(b.key)"
-                                        v-bind:class="{'btn-secondary':b===pressedButton,'btn-outline-secondary':b!==pressedButton}">
-                                        <i v-bind:class="'bi bi-' + b.icon"></i>
-                                    </button>
+                                    <div v-for="bgroup in toolbar">
+                                        <button v-for="b in bgroup" type="button" class="btn"
+                                            v-on:click="toolbarButtonClick(b.key)" v-bind:id="'btn-'+b.key"
+                                            v-bind:title="b.title" v-bind:disabled="isDisabled(b.key)"
+                                            v-bind:class="{'btn-secondary':b===pressedButton,'btn-outline-secondary':b!==pressedButton}">
+                                            <i v-bind:class="'bi bi-' + b.icon"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-12 col-md-10">
