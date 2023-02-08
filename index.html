@@ -732,7 +732,7 @@
                         // check token exist:
                         let loading = showLoading('Prepare Create NFT', 'Check NFT token ID...');
                         try {
-                            let contract = new ethers.Contract(window.NFT_ADDR, window.NFT_ABI, window.getWeb3Provider().getSigner());
+                            let contract = new ethers.Contract(window.PIXELS_ADDR, window.PIXELS_ABI, window.getWeb3Provider().getSigner());
                             let exist = await contract.tokenExist(tokenId);
                             if (exist) {
                                 throw 'This pixels art is already minted.';
@@ -746,7 +746,7 @@
                             loading.close();
                             let
                                 urlText = window.OPENSEA_URL + '0x...',
-                                url = window.OPENSEA_URL + window.NFT_ADDR + '/' + ethers.BigNumber.from(tokenId).toString();
+                                url = window.OPENSEA_URL + window.PIXELS_ADDR + '/' + ethers.BigNumber.from(tokenId).toString();
                             showInfo('Success', '<p>The 1024 Pixels Art was created successfully!</p><p>You should find the NFT on OpenSea shortly: </p><p><a target="_blank" href="' +
                                 url + '">' + urlText + ' <i class="bi bi-box-arrow-up-right"></i></a></p>');
                         } catch (err) {
