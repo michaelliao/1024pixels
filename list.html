@@ -195,7 +195,7 @@
                         this.search.creator = this.account;
                     },
                     getTokenUrl: function (nft) {
-                        return window.SCAN_URL + '/token/' + window.NFT_ADDR + '?a=' + nft.id;
+                        return window.SCAN_URL + '/token/' + window.PIXELS_ADDR + '?a=' + nft.id;
                     },
                     getCreatorUrl: function (nft) {
                         return window.SCAN_URL + '/address/' + nft.creator;
@@ -204,7 +204,7 @@
                         return window.SCAN_URL + '/address/' + nft.owner;
                     },
                     getMarketUrl: function (nft) {
-                        return window.OPENSEA_URL + window.NFT_ADDR + '/' + nft.id;
+                        return window.OPENSEA_URL + window.PIXELS_ADDR + '/' + nft.id;
                     },
                     getReceiptUrl: function (nft) {
                         return window.SCAN_URL + '/tx/' + nft.transactionHash;
