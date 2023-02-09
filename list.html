@@ -258,7 +258,7 @@
                             let query = {
                                 "query": `
 {
-  nfts(${where} first: 100, orderBy: blockTimestamp, orderDirection: desc) {
+    pixelsNfts(${where} first: 100, orderBy: blockTimestamp, orderDirection: desc) {
     id
     owner
     creator
@@ -269,7 +269,7 @@
 }`
                             };
                             let result = await this.postJson(window.GRAPH_URL, query);
-                            this.nfts = result.data.nfts;
+                            this.nfts = result.data.pixelsNfts;
                             this.loadError = false;
                         } catch (err) {
                             this.loadError = true;
@@ -454,7 +454,7 @@
                             Browse</span></a>
                     </li>
                     <li class="nav-item">
-                        <a v-bind:href="marketUrl" class="nav-link"><i class="bi bi-bag-heart"></i>
+                        <a v-bind:href="marketUrl" class="nav-link"><i class="bi bi-bag-check"></i>
                             Market</span></a>
                     </li>
                 </ul>
@@ -528,11 +528,11 @@
                                 <a v-bind:href="getTokenUrl(nft)" title="Token ID" target="_blank"><i
                                         class="bi bi-image"></i></a>
                                 <a v-bind:href="getCreatorUrl(nft)" title="Creator" target="_blank"><i
-                                        class="bi bi-pencil"></i></a>
+                                        class="bi bi-person-fill-add"></i></a>
                                 <a v-bind:href="getOwnerUrl(nft)" title="Owner" target="_blank"><i
                                         class="bi bi-person-fill"></i></a>
                                 <a v-bind:href="getMarketUrl(nft)" title="Market" target="_blank"><i
-                                        class="bi bi-bag-heart"></i></a>
+                                        class="bi bi-bag-check"></i></a>
                             </div>
                         </div>
                     </div>
