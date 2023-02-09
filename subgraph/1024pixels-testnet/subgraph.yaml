@@ -1,0 +1,46 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Pixels
+    network: mumbai
+    source:
+      address: "0x1024E76fbe54D1016f973FaD36f34ce94D9a128D"
+      abi: Pixels
+      startBlock: 31849511
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PixelsNft
+        - PixelsTransfer
+      abis:
+        - name: Pixels
+          file: ./abis/Pixels.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handlePixelsTransfer
+      file: ./src/pixels.ts
+  - kind: ethereum
+    name: Animations
+    network: mumbai
+    source:
+      address: "0x1024AdA38162dD281Fc41814c11EEb5e29CD8CC9"
+      abi: Animations
+      startBlock: 31849511
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AnimationsNft
+        - AnimationsTransfer
+      abis:
+        - name: Animations
+          file: ./abis/Animations.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleAnimationsTransfer
+      file: ./src/animations.ts
