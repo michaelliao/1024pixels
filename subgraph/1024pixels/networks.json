@@ -1,0 +1,11 @@
+{
+  "matic": {
+    "Pixels": {
+      "address": "0x1024E76fbe54D1016f973FaD36f34ce94D9a128D",
+      "startBlock": 39060107
+    },
+    "Animations": {
+      "address": "0x1024AdA38162dD281Fc41814c11EEb5e29CD8CC9"
+    }
+  }
+}
