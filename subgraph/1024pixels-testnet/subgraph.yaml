@@ -15,7 +15,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - PixelsNft
-        - PixelsTransfer
+        - Transfer
       abis:
         - name: Pixels
           file: ./abis/Pixels.json
