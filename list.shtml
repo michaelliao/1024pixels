@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!--#include file="inc/header.html"-->
+    <!--#include file="inc/global-js.html"-->
+
+    <style>
+        .nav-link.active {
+            cursor: default;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.9);
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .nft {
+            display: inline-block;
+            width: 118px;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        .nft:hover {
+            background-color: #f8f9fa;
+        }
+
+        .nft img {
+            width: 98px;
+            height: 98px;
+            border: 1px solid #ccc;
+        }
+
+        .nft:hover img {
+            border-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .nft .text-center a {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .nft:hover .text-center a {
+            color: #0d6efd;
+        }
+    </style>
+
+    <script>
+        function init_vm() {
+            console.log('init vm...');
+            window.vm = new Vue({
+                el: '#vm',
+                data: {
+                    account: null,
+                    search: {
+                        tokenId: '',
+                        creator: '',
+                        owner: '',
+                        error: {
+                            tokenId: false,
+                            creator: false,
+                            owner: false
+                        }
+                    },
+                    nfts: [],
+                    loading: false,
+                    loadError: false,
+                    version: 0
+                },
+                computed: {
+                    canSetMe: function () {
+                        return this.account !== null;
+                    }
+                },
+                methods: {
+                    setOwnedByMe: function () {
+                        this.search.owner = this.account;
+                    },
+                    setCreatedByMe: function () {
+                        this.search.creator = this.account;
+                    },
+                    getTokenUrl: function (nft) {
+                        return window.SCAN_URL + '/token/' + window.PIXELS_ADDR + '?a=' + nft.id;
+                    },
+                    getCreatorUrl: function (nft) {
+                        return window.SCAN_URL + '/address/' + nft.creator;
+                    },
+                    getOwnerUrl: function (nft) {
+                        return window.SCAN_URL + '/address/' + nft.owner;
+                    },
+                    getMarketUrl: function (nft) {
+                        return window.OPENSEA_URL + window.PIXELS_ADDR + '/' + nft.id;
+                    },
+                    getReceiptUrl: function (nft) {
+                        return window.SCAN_URL + '/tx/' + nft.transactionHash;
+                    },
+                    searchNFTs: async function () {
+                        let
+                            tokenId = this.search.tokenId.trim(),
+                            owner = this.search.owner.trim(),
+                            creator = this.search.creator.trim();
+
+                        // clear errors:
+                        for (let k in this.search.error) {
+                            this.search.error[k] = false;
+                        }
+
+                        // check:
+                        if (tokenId !== '' && ! /^[0-9]{1,78}$/.test(tokenId)) {
+                            this.search.error.tokenId = true;
+                        }
+                        if (owner !== '' && !ethers.utils.isAddress(owner.toLowerCase())) {
+                            this.search.error.owner = true;
+                        }
+                        if (creator !== '' && !ethers.utils.isAddress(creator.toLowerCase())) {
+                            this.search.error.creator = true;
+                        }
+                        for (let k in this.search.error) {
+                            if (this.search.error[k]) {
+                                return;
+                            }
+                        }
+
+                        this.version++;
+                        this.loading = true;
+                        this.loadError = false;
+                        this.nfts = [];
+                        try {
+                            let condition = [];
+                            if (tokenId) {
+                                condition.push(`id: "${tokenId}"`);
+                            }
+                            if (owner) {
+                                condition.push(`owner: "${owner}"`);
+                            }
+                            if (creator) {
+                                condition.push(`creator: "${creator}"`);
+                            }
+                            let where = '';
+                            if (condition.length > 0) {
+                                where = `where: {${condition.join(',')}},`;
+                            }
+                            let query = {
+                                "query": `
+{
+    pixelsNfts(${where} first: 100, orderBy: blockTimestamp, orderDirection: desc) {
+    id
+    owner
+    creator
+    blockTimestamp
+    transactionHash
+    image
+  }
+}`
+                            };
+                            let result = await this.postJson(window.GRAPH_URL, query);
+                            this.nfts = result.data.pixelsNfts;
+                            this.loadError = false;
+                        } catch (err) {
+                            this.loadError = true;
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+                    postJson: async function (url, data) {
+                        let opt = {
+                            type: 'POST',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            url: url,
+                            data: JSON.stringify(data)
+                        };
+                        return await $.ajax(opt);
+                    },
+                    accountChanged: function (account) {
+                        this.account = account;
+                    }
+                },
+                mounted: async function () {
+                    await this.searchNFTs();
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <!--#include file="inc/dialog.html"-->
+    <!--#include file="inc/nav.html"-->
+
+    <div id="vm" class="container">
+        <div class="row">
+            <div class="col-12">
+                <form onsubmit="return false">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="mb-3">
+                                <input v-model="search.tokenId" type="text" class="form-control form-control-sm"
+                                    v-bind:class="{'is-invalid': search.error.tokenId}" placeholder="Token ID">
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="mb-3">
+                                <input v-model="search.owner" type="text" class="form-control form-control-sm"
+                                    v-bind:class="{'is-invalid': search.error.owner}" placeholder="Owner">
+                                <div class="form-text">
+                                    <a v-show="canSetMe" v-on:click="setOwnedByMe()" href="#0">Owned by me</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <input v-model="search.creator" type="text" class="form-control form-control-sm"
+                                v-bind:class="{'is-invalid': search.error.creator}" placeholder="Creator">
+                            <div class="form-text">
+                                <a v-show="canSetMe" v-on:click="setCreatedByMe()" href="#0">Created by me</a>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <button v-on:click="searchNFTs" v-bind:disabled="loading" type="button"
+                                class="btn btn-sm btn-outline-primary">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div v-show="loading" class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div v-show="loadError" class="alert alert-danger">
+                    Search failed. Please try later.
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div v-show="nfts.length>0" class="mb-4">
+                    <div v-for="nft in nfts" class="nft">
+                        <div>
+                            <img v-bind:src="nft.image">
+                        </div>
+                        <div class="text-center">
+                            <a v-bind:href="getTokenUrl(nft)" title="Token ID" target="_blank"><i
+                                    class="bi bi-image"></i></a>
+                            <a v-bind:href="getCreatorUrl(nft)" title="Creator" target="_blank"><i
+                                    class="bi bi-person-fill-add"></i></a>
+                            <a v-bind:href="getOwnerUrl(nft)" title="Owner" target="_blank"><i
+                                    class="bi bi-person-fill"></i></a>
+                            <a v-bind:href="getMarketUrl(nft)" title="Market" target="_blank"><i
+                                    class="bi bi-bag-check"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div v-show="nfts.length>=100" class="mb-4 text-center">
+                    <span>Only the first of 100 NFTs are displayed.</span>
+                </div>
+                <div v-show="!loading && !loadError && nfts.length===0" class="mb-4 text-center">
+                    <span>No NFT found that matches the search.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--#include file="inc/footer.html"-->
+</body>
+
+</html>

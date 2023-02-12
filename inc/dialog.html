@@ -1,0 +1,133 @@
+<script>
+    // show dialogs:
+
+    function showAlert(title, message) {
+        let m = $('#alertModal');
+        m.find('.x-title').text(title);
+        m.find('.x-message').text(message);
+        let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+        myModal.show();
+    }
+
+    function showInfo(title, message) {
+        let m = $('#infoModal');
+        m.find('.x-title').text(title);
+        if (message.startsWith('<')) {
+            m.find('.x-message').html(message);
+        } else {
+            m.find('.x-message').text(message);
+        }
+        let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+        myModal.show();
+    }
+
+    function showLoading(title, message) {
+        let m = $('#loadingModal');
+        let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+        let obj = {
+            setTitle: (t) => {
+                m.find('.x-title').text(t);
+            },
+            setMessage: (t) => {
+                m.find('.x-message').text(t);
+            },
+            close: () => {
+                setTimeout(function () {
+                    myModal.hide();
+                }, 500);
+            }
+        }
+        obj.setTitle(title);
+        obj.setMessage(message);
+        myModal.show();
+        return obj;
+    }
+
+    function showTip(msg, isError) {
+        let $div = $('<div/>');
+        $div.addClass('alert');
+        $div.addClass(isError ? 'alert-danger' : 'alert-success');
+        $div.text(msg);
+        $div.css('display', 'none');
+        $('#tips').prepend($div);
+        $div.fadeIn().delay(2000).fadeOut();
+    }
+</script>
+
+
+<!-- Loading Modal -->
+<div id="loadingModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="loadingLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-items-center d-flex">
+                <h4 class="modal-title x-title" id="loadingLabel">&nbsp;</h4>
+            </div>
+            <div class="modal-body">
+                <div class="float-start">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div class="ms-5 ps-4 float-none">
+                    <p class="x-message">&nbsp;</p>
+                </div>
+            </div>
+            <!-- <div class="modal-footer">
+                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                </div> -->
+        </div>
+    </div>
+</div>
+
+<!-- Alert Modal -->
+<div id="alertModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="alertLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-items-center d-flex">
+                <h4 class="modal-title x-title" id="alertLabel">&nbsp;</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="float-start">
+                    <i class="fs-2 text-danger fe fe-alert-triangle"></i>
+                </div>
+                <div class="ms-5 ps-4 float-none">
+                    <p class="x-message">&nbsp;</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Modal -->
+<div id="infoModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="infoLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-items-center d-flex">
+                <h4 class="modal-title x-title" id="infoLabel">&nbsp;</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="float-start">
+                    <i class="fs-2 fe fe-info"></i>
+                </div>
+                <div class="ms-5 ps-4 float-none">
+                    <p class="x-message">&nbsp;</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tips" class="autoclose">
+</div>

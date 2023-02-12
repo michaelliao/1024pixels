@@ -1,0 +1,187 @@
+<script>
+    $(function () {
+        console.log('init wallet...');
+        window.vm_wallet = new Vue({
+            el: '#vm_wallet',
+            data: {
+                account: null,
+                chainId: 0
+            },
+            computed: {
+                marketUrl: function () {
+                    return window.MARKET_URL;
+                },
+                ready: function () {
+                    return this.account && this.chainId === window.CHAIN_ID;
+                },
+                networkName: function () {
+                    return window.CHAIN_NAME;
+                },
+                wrongNetworkName: function () {
+                    return 'Unsupported Chain (' + this.chainId + ')';
+                },
+                wrongNetwork: function () {
+                    return this.chainId !== window.CHAIN_ID;
+                }
+            },
+            methods: {
+                abbrAddress: function (addr) {
+                    if (!addr) {
+                        return '';
+                    }
+                    let s = addr.toString();
+                    if (s.indexOf('0x') === 0 && s.length === 42) {
+                        let addr = ethers.utils.getAddress(s.substring(0));
+                        return addr.substring(0, 6) + '...' + addr.substring(38);
+                    }
+                    return s;
+                },
+                gotoScanUrl: function () {
+                    window.open(window.SCAN_URL + '/address/' + this.account);
+                },
+                accountChanged: function (accounts) {
+                    console.log('wallet account changed:', accounts.length === 0 ? null : accounts[0]);
+                    if (accounts.length === 0) {
+                        this.disconnected();
+                    } else {
+                        this.account = accounts[0];
+                        document.cookie = '__account__=' + this.account + ';max-age=1296000';
+                        try {
+                            window.vm.accountChanged && window.vm.accountChanged(this.account);
+                        } catch (e) {
+                            console.error('call vm.accountChanged() failed.', e);
+                        }
+                    }
+                },
+                disconnected: async function () {
+                    console.warn('wallet disconnected.');
+                    this.account = null;
+                    try {
+                        window.vm.accountChanged && window.vm.accountChanged(null);
+                    } catch (e) {
+                        console.error('call vm.accountChanged(null) failed.', e);
+                    }
+                },
+                chainChanged: function (chainId) {
+                    console.log('wallet chainId changed: ' + chainId + ' = ' + parseInt(chainId, 16));
+                    this.chainId = parseInt(chainId, 16);
+                    try {
+                        window.vm.chainChanged && window.vm.chainChanged(this.chainId);
+                    } catch (e) {
+                        console.error('call vm.chainChanged() failed.', e);
+                    }
+                },
+                connectWallet: async function () {
+                    console.log('try connect wallet...');
+                    if (window.getWeb3Provider() === null) {
+                        console.error('there is no web3 provider.');
+                        return false;
+                    }
+                    try {
+                        this.accountChanged(await window.ethereum.request({
+                            method: 'eth_requestAccounts',
+                        }));
+                        this.chainChanged(await window.ethereum.request({
+                            method: 'eth_chainId'
+                        }));
+                        window.ethereum.on('disconnect', this.disconnected);
+                        window.ethereum.on('accountsChanged', this.accountChanged);
+                        window.ethereum.on('chainChanged', this.chainChanged);
+                    } catch (e) {
+                        console.error('could not get a wallet connection.', e);
+                        return false;
+                    }
+                    console.log('wallet connected.');
+                    return true;
+                },
+                switchChain: async function () {
+                    if (this.wrongNetwork) {
+                        await ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x' + window.CHAIN_ID.toString(16) }],
+                        });
+                    }
+                }
+            },
+            mounted: async function () {
+                // try init_vm:
+                try {
+                    init_vm();
+                } catch (e) {
+                    console.error('call init_vm() failed.', e);
+                }
+            }
+        });
+    });
+</script>
+
+<div id="vm_wallet" class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom"
+        style="position:fixed; top:0; left:0; right:0; z-index: 99;">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-images"></i> 1024 Pixels</a>
+            <ul class="mr-2 navbar-nav d-none d-lg-flex">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">
+                        <i class="bi bi-image"></i>
+                        <span>Create</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/list.html" class="nav-link">
+                        <i class="bi bi-list-ul"></i>
+                        <span>Browse</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a v-bind:href="marketUrl" class="nav-link">
+                        <i class="bi bi-bag-check"></i>
+                        <span>Market</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="mr-2 navbar-nav d-lg-none">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#0" data-bs-toggle="dropdown">
+                        <i class="bi bi-menu-button-wide"></i>
+                        Menu
+                    </a>
+                    <ul class="dropdown-menu" style="position: absolute;">
+                        <li><a class="dropdown-item" href="/">
+                                <i class="bi bi-image"></i>
+                                Create</a></li>
+                        <li><a class="dropdown-item" href="/list.html">
+                                <i class="bi bi-list-ul"></i>
+                                Browse
+                            </a></li>
+                        <li><a class="dropdown-item" v-bind:href="marketUrl">
+                                <i class="bi bi-bag-check"></i>
+                                Market
+                            </a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul id="wallet" class="mr-2 navbar-nav navbar-right-wrap" style="flex-direction: row !important;">
+                <li v-if="chainId!==0 && wrongNetwork" class="nav-item">
+                    <a v-on:click="switchChain" href="#0" class="nav-link"><i
+                            class="bi bi-exclamation-triangle-fill text-warning"></i>
+                        <span v-text="wrongNetworkName" class="d-none d-lg-inline-block"></span></a>
+                </li>
+                <li v-if="chainId!==0 && !wrongNetwork" class="nav-item">
+                    <a v-on:click="switchChain" href="#0" class="nav-link"><i class="bi bi-globe"></i>
+                        <span v-text="networkName"></span></a>
+                </li>
+                <li v-if="account===null" class="nav-item">
+                    <button v-on:click="connectWallet" type="button" class="btn btn-primary">Connect Wallet</button>
+                </li>
+                <li v-if="account!==null" class="nav-item">
+                    <a href="#0" class="nav-link" v-bind:title="abbrAddress(account)" v-on:click="gotoScanUrl"><i
+                            class="bi bi-wallet"></i>
+                        <span v-text="abbrAddress(account)" class="d-none d-lg-inline-block"></span> <i
+                            class="fe fe-external-link"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+<div style="height: 80px"><!-- placeholder --></div>

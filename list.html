@@ -1,23 +1,96 @@
+<!-- AUTO GENERATED HTML: DO NOT MODIFY MANUALLY -->
 <!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="1024 pixels art on Polygon blockchain.">
+<!-- header -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="1024 pixels art on Polygon blockchain.">
 
-    <title>1024 Pixels Art</title>
-    <link id="linkFavicon" rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+<title>1024 Pixels Art</title>
+<link id="linkFavicon" rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.0.32/dist/ethers.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/base64-js@1.5.1/base64js.min.js"></script>
-    <script src="static/js/pixels.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.0.32/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/base64-js@1.5.1/base64js.min.js"></script>
+<!--// header -->
+<script>
+    // global vars:
+    (function () {
+        const isTestnet = location.hostname === 'localhost';
+        window.CHAIN_ID = isTestnet ? 80001 : 137;
+        window.CHAIN_NAME = isTestnet ? 'Polygon Testnet' : 'Polygon';
+        window.SCAN_URL = isTestnet ? 'https://mumbai.polygonscan.com' : 'https://polygonscan.com';
+        window.OPENSEA_URL = isTestnet ? 'https://testnets.opensea.io/assets/mumbai/' : 'https://opensea.io/assets/matic/';
+        window.MARKET_URL = isTestnet ? 'https://testnets.opensea.io/collection/1024pixels-art' : 'https://opensea.io/collection/1024pixels-art';
+        window.GRAPH_URL = 'https://api.thegraph.com/subgraphs/name/michaelliao/' + (isTestnet ? '1024pixels-testnet' : '1024pixels')
+        window.PIXELS_ADDR = '0x1024E76fbe54D1016f973FaD36f34ce94D9a128D';
+        window.PIXELS_ABI = '[{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"address","name":"owner","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"creator","type":"address"},{"indexed":true,"internalType":"address","name":"redirectTo","type":"address"}],"name":"Redirect","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"creatorOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"}],"name":"creatorRedirect","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"imageData","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"imageURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"name":"imagesData","outputs":[{"internalType":"bytes[]","name":"","type":"bytes[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"bytes","name":"data","type":"bytes"}],"name":"mint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"mintFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"royaltyFraction","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"salePrice","type":"uint256"}],"name":"royaltyInfo","outputs":[{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"royaltyAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"setCreatorRedirect","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"val","type":"uint256"}],"name":"setMintFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"val","type":"uint256"}],"name":"setRoyaltyFraction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"superOperator","type":"address"},{"internalType":"bool","name":"add","type":"bool"}],"name":"setSuperOperator","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenExist","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"tokens","type":"address[]"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}]';
+
+        window.ANIMATIONS_ADDR = '0x1024AdA38162dD281Fc41814c11EEb5e29CD8CC9';
+        window.ANIMATIONS_ABI = '[{"inputs":[{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"symbol","type":"string"},{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"pixelsContract","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"approved","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"operator","type":"address"},{"indexed":false,"internalType":"bool","name":"approved","type":"bool"}],"name":"ApprovalForAll","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"creator","type":"address"},{"indexed":true,"internalType":"address","name":"redirectTo","type":"address"}],"name":"Redirect","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"approve","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"creatorOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"}],"name":"creatorRedirect","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getApproved","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"imageData","outputs":[{"components":[{"internalType":"uint8","name":"interval","type":"uint8"},{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"internalType":"struct Animations.AnimationInfo","name":"","type":"tuple"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"imageURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"operator","type":"address"}],"name":"isApprovedForAll","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"maxFrames","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint8","name":"interval","type":"uint8"},{"internalType":"uint256[]","name":"tokenIds","type":"uint256[]"}],"name":"mint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[],"name":"mintFee","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"ownerOf","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"royaltyFraction","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"uint256","name":"salePrice","type":"uint256"}],"name":"royaltyInfo","outputs":[{"internalType":"address","name":"receiver","type":"address"},{"internalType":"uint256","name":"royaltyAmount","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"name":"safeTransferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"operator","type":"address"},{"internalType":"bool","name":"approved","type":"bool"}],"name":"setApprovalForAll","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"}],"name":"setCreatorRedirect","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"_maxFrames","type":"uint256"}],"name":"setMaxFrames","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"val","type":"uint256"}],"name":"setMintFee","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"val","type":"uint256"}],"name":"setRoyaltyFraction","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"superOperator","type":"address"},{"internalType":"bool","name":"add","type":"bool"}],"name":"setSuperOperator","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"bytes4","name":"interfaceId","type":"bytes4"}],"name":"supportsInterface","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenExist","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"tokenURI","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"transferFrom","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address[]","name":"tokens","type":"address[]"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"}]';
+
+        window.INDEX_COLORS = [
+            '#ffc0c0', '#ffffc0', '#c0ffc0', '#00ffc0', '#c0ffff', '#80c0ff', '#c0c0ff', '#ffc0ff',
+            '#ff8080', '#ffff80', '#80ff80', '#00ff80', '#80ffff', '#0080ff', '#ff80c0', '#ff80ff',
+            '#ff0000', '#ffff00', '#80ff00', '#00ff40', '#00ffff', '#0080c0', '#8080c0', '#ff00ff',
+            '#c00000', '#ffc080', '#c08000', '#00c0c0', '#00c0ff', '#8040c0', '#804080', '#ff40c0',
+            '#804040', '#ff8040', '#00ff00', '#008080', '#004080', '#8080ff', '#800040', '#ff0080',
+            '#800000', '#ff8000', '#008000', '#008040', '#0000ff', '#0000a0', '#800080', '#8000ff',
+            '#400000', '#804000', '#004000', '#004040', '#000080', '#000040', '#400040', '#400080',
+            '#000000', '#808000', '#808040', '#808080', '#408080', '#c0c0c0', '#ffffff', 'transparent'
+        ];
+
+        function toRGB(hex) {
+            if (hex.startsWith('#')) {
+                hex = hex.substring(1);
+            }
+            let rgb = parseInt(hex, 16);
+            return [(rgb & 0xff0000) >> 16, (rgb & 0xff00) >> 8, rgb & 0xff];
+        }
+
+        function convertRgbColors() {
+            let colors = [];
+            for (let i = 0; i < window.INDEX_COLORS.length - 1 /* skip last transparent color */; i++) {
+                colors.push(toRGB(window.INDEX_COLORS[i]));
+            }
+            return colors;
+        }
+
+        window.RGB_COLORS = convertRgbColors();
+    })();
+
+    function getWeb3Provider() {
+        if (!window.web3Provider) {
+            if (!window.ethereum) {
+                console.error("there is no web3 provider.");
+                return null;
+            }
+            window.web3Provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+        }
+        return window.web3Provider;
+    }
+
+    function translateError(err) {
+        window.err = err;
+        if (typeof (err) === 'string') {
+            return err;
+        }
+        if (err.error && err.error.code && err.error.message) {
+            return `Error (${err.error.code}): ${err.error.message}`;
+        }
+        if (err.code && err.message) {
+            return `Error (${err.code}): ${err.message}`;
+        }
+        return err.message || err.toString();
+    }
+</script>
 
     <style>
         .nav-link.active {
@@ -60,95 +133,12 @@
     </style>
 
     <script>
-        function keccak(str) {
-            let arr = new TextEncoder().encode(str);
-            return ethers.utils.keccak256(arr);
-        }
-
-        function toBN(s, decimals) {
-            try {
-                return ethers.utils.parseUnits(s.trim(), decimals);
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function isValidBN(s, decimals) {
-            let bn = toBN(s, decimals);
-            return bn !== null && !bn.isZero() && !bn.isNegative();
-        }
-
-        function isValidAddress(s) {
-            try {
-                ethers.utils.getAddress(s);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        function getWeb3Provider() {
-            if (!window.web3Provider) {
-                if (!window.ethereum) {
-                    console.error("there is no web3 provider.");
-                    return null;
-                }
-                window.web3Provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-            }
-            return window.web3Provider;
-        }
-
-        function showAlert(title, message) {
-            let m = $('#alertModal');
-            m.find('.x-title').text(title);
-            m.find('.x-message').text(message);
-            let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
-            myModal.show();
-        }
-
-        function showInfo(title, message) {
-            let m = $('#infoModal');
-            m.find('.x-title').text(title);
-            if (message.startsWith('<')) {
-                m.find('.x-message').html(message);
-            } else {
-                m.find('.x-message').text(message);
-            }
-            let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
-            myModal.show();
-        }
-
-        function showTip(msg, isError) {
-            let $div = $('<div/>');
-            $div.addClass('alert');
-            $div.addClass(isError ? 'alert-danger' : 'alert-success');
-            $div.text(msg);
-            $div.css('display', 'none');
-            $('#tips').prepend($div);
-            $div.fadeIn().delay(2000).fadeOut();
-        }
-
-        function translateError(err) {
-            window.err = err;
-            if (typeof (err) === 'string') {
-                return err;
-            }
-            if (err.error && err.error.code && err.error.message) {
-                return `Error (${err.error.code}): ${err.error.message}`;
-            }
-            if (err.code && err.message) {
-                return `Error (${err.code}): ${err.message}`;
-            }
-            return err.message || err.toString();
-        }
-
-        function init() {
-            console.log('init vue...');
+        function init_vm() {
+            console.log('init vm...');
             window.vm = new Vue({
                 el: '#vm',
                 data: {
                     account: null,
-                    chainId: 0,
                     search: {
                         tokenId: '',
                         creator: '',
@@ -165,26 +155,8 @@
                     version: 0
                 },
                 computed: {
-                    marketUrl: function () {
-                        return window.MARKET_URL;
-                    },
                     canSetMe: function () {
                         return this.account !== null;
-                    },
-                    ready: function () {
-                        return this.account && this.chainId === window.CHAIN_ID;
-                    },
-                    networkName: function () {
-                        if (this.account) {
-                            if (this.chainId === window.CHAIN_ID) {
-                                return window.CHAIN_NAME;
-                            }
-                            return 'Unsupported Chain (0x' + this.chainId.toString(16) + ')';
-                        }
-                        return 'Not connected';
-                    },
-                    wrongNetwork: function () {
-                        return this.chainId !== window.CHAIN_ID;
                     }
                 },
                 methods: {
@@ -287,288 +259,437 @@
                         };
                         return await $.ajax(opt);
                     },
-                    abbrAddress: function (addr) {
-                        if (!addr) {
-                            return '';
-                        }
-                        let s = addr.toString();
-                        if (s.indexOf('0x') === 0 && s.length === 42) {
-                            let addr = ethers.utils.getAddress(s.substring(0));
-                            return addr.substring(0, 6) + '...' + addr.substring(38);
-                        }
-                        return s;
-                    },
-                    gotoScanUrl: function () {
-                        window.open(window.SCAN_URL + '/address/' + this.account);
-                    },
-                    accountChanged: function (accounts) {
-                        console.log('wallet account changed:', accounts.length === 0 ? null : accounts[0]);
-                        if (accounts.length === 0) {
-                            this.disconnected();
-                        } else {
-                            this.account = accounts[0];
-                            document.cookie = '__account__=' + this.account + ';max-age=1296000';
-                        }
-                    },
-                    disconnected: async function () {
-                        console.warn('wallet disconnected.');
-                        this.account = null;
-                    },
-                    chainChanged: function (chainId) {
-                        console.log('wallet chainId changed: ' + chainId + ' = ' + parseInt(chainId, 16));
-                        this.chainId = parseInt(chainId, 16);
-                    },
-                    connectWallet: async function () {
-                        console.log('try connect wallet...');
-                        if (window.getWeb3Provider() === null) {
-                            console.error('there is no web3 provider.');
-                            return false;
-                        }
-                        try {
-                            this.accountChanged(await window.ethereum.request({
-                                method: 'eth_requestAccounts',
-                            }));
-                            this.chainChanged(await window.ethereum.request({
-                                method: 'eth_chainId'
-                            }));
-                            window.ethereum.on('disconnect', this.disconnected);
-                            window.ethereum.on('accountsChanged', this.accountChanged);
-                            window.ethereum.on('chainChanged', this.chainChanged);
-                        } catch (e) {
-                            console.error('could not get a wallet connection.', e);
-                            return false;
-                        }
-                        console.log('wallet connected.');
-                        return true;
-                    },
-                    switchChain: async function () {
-                        if (this.wrongNetwork) {
-                            await ethereum.request({
-                                method: 'wallet_switchEthereumChain',
-                                params: [{ chainId: '0x' + window.CHAIN_ID.toString(16) }],
-                            });
-                        }
+                    accountChanged: function (account) {
+                        this.account = account;
                     }
-                },
-                watch: {
                 },
                 mounted: async function () {
                     await this.searchNFTs();
                 }
             });
         }
-
-        $(function () {
-            init();
-        });
     </script>
 </head>
 
 <body>
-    <!-- Loading Modal -->
-    <div id="loadingModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="loadingLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header align-items-center d-flex">
-                    <h4 class="modal-title x-title" id="loadingLabel">&nbsp;</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="float-start">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                    <div class="ms-5 ps-4 float-none">
-                        <p class="x-message">&nbsp;</p>
-                    </div>
-                </div>
-                <!-- <div class="modal-footer">
-                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
-                </div> -->
+<script>
+    // show dialogs:
+
+    function showAlert(title, message) {
+        let m = $('#alertModal');
+        m.find('.x-title').text(title);
+        m.find('.x-message').text(message);
+        let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+        myModal.show();
+    }
+
+    function showInfo(title, message) {
+        let m = $('#infoModal');
+        m.find('.x-title').text(title);
+        if (message.startsWith('<')) {
+            m.find('.x-message').html(message);
+        } else {
+            m.find('.x-message').text(message);
+        }
+        let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+        myModal.show();
+    }
+
+    function showLoading(title, message) {
+        let m = $('#loadingModal');
+        let myModal = new bootstrap.Modal(m.get(0), { backdrop: 'static', keyboard: false });
+        let obj = {
+            setTitle: (t) => {
+                m.find('.x-title').text(t);
+            },
+            setMessage: (t) => {
+                m.find('.x-message').text(t);
+            },
+            close: () => {
+                setTimeout(function () {
+                    myModal.hide();
+                }, 500);
+            }
+        }
+        obj.setTitle(title);
+        obj.setMessage(message);
+        myModal.show();
+        return obj;
+    }
+
+    function showTip(msg, isError) {
+        let $div = $('<div/>');
+        $div.addClass('alert');
+        $div.addClass(isError ? 'alert-danger' : 'alert-success');
+        $div.text(msg);
+        $div.css('display', 'none');
+        $('#tips').prepend($div);
+        $div.fadeIn().delay(2000).fadeOut();
+    }
+</script>
+
+
+<!-- Loading Modal -->
+<div id="loadingModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="loadingLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-items-center d-flex">
+                <h4 class="modal-title x-title" id="loadingLabel">&nbsp;</h4>
             </div>
-        </div>
-    </div>
-
-    <!-- Alert Modal -->
-    <div id="alertModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="alertLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header align-items-center d-flex">
-                    <h4 class="modal-title x-title" id="alertLabel">&nbsp;</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="float-start">
-                        <i class="fs-2 text-danger fe fe-alert-triangle"></i>
-                    </div>
-                    <div class="ms-5 ps-4 float-none">
-                        <p class="x-message">&nbsp;</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Info Modal -->
-    <div id="infoModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="infoLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header align-items-center d-flex">
-                    <h4 class="modal-title x-title" id="infoLabel">&nbsp;</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="float-start">
-                        <i class="fs-2 fe fe-info"></i>
-                    </div>
-                    <div class="ms-5 ps-4 float-none">
-                        <p class="x-message">&nbsp;</p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="vm" class="container">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom"
-            style="position:fixed; top:0; left:0; right:0; z-index: 99;">
-            <div class="container">
-                <a class="navbar-brand" href="#0" style="cursor:default"><i class="bi bi-images"></i> 1024 Pixels</a>
-                <ul class="mr-2 navbar-nav">
-                    <li class="nav-item">
-                        <a href="index.html" class="nav-link"><i class="bi bi-image"></i>
-                            Create</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#0" class="nav-link active"><i class="bi bi-list-ul"></i>
-                            Browse</span></a>
-                    </li>
-                    <li class="nav-item">
-                        <a v-bind:href="marketUrl" class="nav-link"><i class="bi bi-bag-check"></i>
-                            Market</span></a>
-                    </li>
-                </ul>
-                <ul id="wallet" class="mr-2 navbar-nav navbar-right-wrap" style="flex-direction: row !important;">
-                    <li class="nav-item">
-                        <a v-on:click="switchChain" href="#0" class="nav-link"><i class="bi bi-globe"></i>
-                            <span v-text="networkName"></span></a>
-                    </li>
-                    <li v-if="account===null" class="nav-item">
-                        <button v-on:click="connectWallet" type="button" class="btn btn-primary">Connect Wallet</button>
-                    </li>
-                    <li v-if="account!==null" class="nav-item">
-                        <a href="#0" class="nav-link" v-on:click="gotoScanUrl"><i class="bi bi-wallet"></i>
-                            <span v-text="abbrAddress(account)"></span> <i class="fe fe-external-link"></i></a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <div style="padding-top: 80px;">
-            <div class="row">
-                <div class="col-12">
-                    <form onsubmit="return false">
-                        <div class="row">
-                            <div class="col-2">
-                                <div class="mb-3">
-                                    <input v-model="search.tokenId" type="text" class="form-control form-control-sm"
-                                        v-bind:class="{'is-invalid': search.error.tokenId}" placeholder="Token ID">
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <div class="mb-3">
-                                    <input v-model="search.owner" type="text" class="form-control form-control-sm"
-                                        v-bind:class="{'is-invalid': search.error.owner}" placeholder="Owner">
-                                    <div class="form-text">
-                                        <a v-show="canSetMe" v-on:click="setOwnedByMe()" href="#0">Owned by me</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <input v-model="search.creator" type="text" class="form-control form-control-sm"
-                                    v-bind:class="{'is-invalid': search.error.creator}" placeholder="Creator">
-                                <div class="form-text">
-                                    <a v-show="canSetMe" v-on:click="setCreatedByMe()" href="#0">Created by me</a>
-                                </div>
-                            </div>
-                            <div class="col-2">
-                                <button v-on:click="searchNFTs" v-bind:disabled="loading" type="button"
-                                    class="btn btn-sm btn-outline-primary">Search</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="col-12 mb-4">
-                    <div v-show="loading" class="spinner-border" role="status">
+            <div class="modal-body">
+                <div class="float-start">
+                    <div class="spinner-border" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <div v-show="loadError" class="alert alert-danger">
-                        Search failed. Please try later.
-                    </div>
                 </div>
+                <div class="ms-5 ps-4 float-none">
+                    <p class="x-message">&nbsp;</p>
+                </div>
+            </div>
+            <!-- <div class="modal-footer">
+                    <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                </div> -->
+        </div>
+    </div>
+</div>
 
-                <div class="col-12">
-                    <div v-show="nfts.length>0" class="mb-4">
-                        <div v-for="nft in nfts" class="nft">
-                            <div>
-                                <img v-bind:src="nft.image">
-                            </div>
-                            <div class="text-center">
-                                <a v-bind:href="getTokenUrl(nft)" title="Token ID" target="_blank"><i
-                                        class="bi bi-image"></i></a>
-                                <a v-bind:href="getCreatorUrl(nft)" title="Creator" target="_blank"><i
-                                        class="bi bi-person-fill-add"></i></a>
-                                <a v-bind:href="getOwnerUrl(nft)" title="Owner" target="_blank"><i
-                                        class="bi bi-person-fill"></i></a>
-                                <a v-bind:href="getMarketUrl(nft)" title="Market" target="_blank"><i
-                                        class="bi bi-bag-check"></i></a>
+<!-- Alert Modal -->
+<div id="alertModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="alertLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-items-center d-flex">
+                <h4 class="modal-title x-title" id="alertLabel">&nbsp;</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="float-start">
+                    <i class="fs-2 text-danger fe fe-alert-triangle"></i>
+                </div>
+                <div class="ms-5 ps-4 float-none">
+                    <p class="x-message">&nbsp;</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Info Modal -->
+<div id="infoModal" class="modal fade" role="dialog" aria-hidden="true" aria-labelledby="infoLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header align-items-center d-flex">
+                <h4 class="modal-title x-title" id="infoLabel">&nbsp;</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fe fe-x-circle"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="float-start">
+                    <i class="fs-2 fe fe-info"></i>
+                </div>
+                <div class="ms-5 ps-4 float-none">
+                    <p class="x-message">&nbsp;</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tips" class="autoclose">
+</div>
+<script>
+    $(function () {
+        console.log('init wallet...');
+        window.vm_wallet = new Vue({
+            el: '#vm_wallet',
+            data: {
+                account: null,
+                chainId: 0
+            },
+            computed: {
+                marketUrl: function () {
+                    return window.MARKET_URL;
+                },
+                ready: function () {
+                    return this.account && this.chainId === window.CHAIN_ID;
+                },
+                networkName: function () {
+                    return window.CHAIN_NAME;
+                },
+                wrongNetworkName: function () {
+                    return 'Unsupported Chain (' + this.chainId + ')';
+                },
+                wrongNetwork: function () {
+                    return this.chainId !== window.CHAIN_ID;
+                }
+            },
+            methods: {
+                abbrAddress: function (addr) {
+                    if (!addr) {
+                        return '';
+                    }
+                    let s = addr.toString();
+                    if (s.indexOf('0x') === 0 && s.length === 42) {
+                        let addr = ethers.utils.getAddress(s.substring(0));
+                        return addr.substring(0, 6) + '...' + addr.substring(38);
+                    }
+                    return s;
+                },
+                gotoScanUrl: function () {
+                    window.open(window.SCAN_URL + '/address/' + this.account);
+                },
+                accountChanged: function (accounts) {
+                    console.log('wallet account changed:', accounts.length === 0 ? null : accounts[0]);
+                    if (accounts.length === 0) {
+                        this.disconnected();
+                    } else {
+                        this.account = accounts[0];
+                        document.cookie = '__account__=' + this.account + ';max-age=1296000';
+                        try {
+                            window.vm.accountChanged && window.vm.accountChanged(this.account);
+                        } catch (e) {
+                            console.error('call vm.accountChanged() failed.', e);
+                        }
+                    }
+                },
+                disconnected: async function () {
+                    console.warn('wallet disconnected.');
+                    this.account = null;
+                    try {
+                        window.vm.accountChanged && window.vm.accountChanged(null);
+                    } catch (e) {
+                        console.error('call vm.accountChanged(null) failed.', e);
+                    }
+                },
+                chainChanged: function (chainId) {
+                    console.log('wallet chainId changed: ' + chainId + ' = ' + parseInt(chainId, 16));
+                    this.chainId = parseInt(chainId, 16);
+                    try {
+                        window.vm.chainChanged && window.vm.chainChanged(this.chainId);
+                    } catch (e) {
+                        console.error('call vm.chainChanged() failed.', e);
+                    }
+                },
+                connectWallet: async function () {
+                    console.log('try connect wallet...');
+                    if (window.getWeb3Provider() === null) {
+                        console.error('there is no web3 provider.');
+                        return false;
+                    }
+                    try {
+                        this.accountChanged(await window.ethereum.request({
+                            method: 'eth_requestAccounts',
+                        }));
+                        this.chainChanged(await window.ethereum.request({
+                            method: 'eth_chainId'
+                        }));
+                        window.ethereum.on('disconnect', this.disconnected);
+                        window.ethereum.on('accountsChanged', this.accountChanged);
+                        window.ethereum.on('chainChanged', this.chainChanged);
+                    } catch (e) {
+                        console.error('could not get a wallet connection.', e);
+                        return false;
+                    }
+                    console.log('wallet connected.');
+                    return true;
+                },
+                switchChain: async function () {
+                    if (this.wrongNetwork) {
+                        await ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x' + window.CHAIN_ID.toString(16) }],
+                        });
+                    }
+                }
+            },
+            mounted: async function () {
+                // try init_vm:
+                try {
+                    init_vm();
+                } catch (e) {
+                    console.error('call init_vm() failed.', e);
+                }
+            }
+        });
+    });
+</script>
+
+<div id="vm_wallet" class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom"
+        style="position:fixed; top:0; left:0; right:0; z-index: 99;">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-images"></i> 1024 Pixels</a>
+            <ul class="mr-2 navbar-nav d-none d-lg-flex">
+                <li class="nav-item">
+                    <a href="/" class="nav-link">
+                        <i class="bi bi-image"></i>
+                        <span>Create</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/list.html" class="nav-link">
+                        <i class="bi bi-list-ul"></i>
+                        <span>Browse</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a v-bind:href="marketUrl" class="nav-link">
+                        <i class="bi bi-bag-check"></i>
+                        <span>Market</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="mr-2 navbar-nav d-lg-none">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#0" data-bs-toggle="dropdown">
+                        <i class="bi bi-menu-button-wide"></i>
+                        Menu
+                    </a>
+                    <ul class="dropdown-menu" style="position: absolute;">
+                        <li><a class="dropdown-item" href="/">
+                                <i class="bi bi-image"></i>
+                                Create</a></li>
+                        <li><a class="dropdown-item" href="/list.html">
+                                <i class="bi bi-list-ul"></i>
+                                Browse
+                            </a></li>
+                        <li><a class="dropdown-item" v-bind:href="marketUrl">
+                                <i class="bi bi-bag-check"></i>
+                                Market
+                            </a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul id="wallet" class="mr-2 navbar-nav navbar-right-wrap" style="flex-direction: row !important;">
+                <li v-if="chainId!==0 && wrongNetwork" class="nav-item">
+                    <a v-on:click="switchChain" href="#0" class="nav-link"><i
+                            class="bi bi-exclamation-triangle-fill text-warning"></i>
+                        <span v-text="wrongNetworkName" class="d-none d-lg-inline-block"></span></a>
+                </li>
+                <li v-if="chainId!==0 && !wrongNetwork" class="nav-item">
+                    <a v-on:click="switchChain" href="#0" class="nav-link"><i class="bi bi-globe"></i>
+                        <span v-text="networkName"></span></a>
+                </li>
+                <li v-if="account===null" class="nav-item">
+                    <button v-on:click="connectWallet" type="button" class="btn btn-primary">Connect Wallet</button>
+                </li>
+                <li v-if="account!==null" class="nav-item">
+                    <a href="#0" class="nav-link" v-bind:title="abbrAddress(account)" v-on:click="gotoScanUrl"><i
+                            class="bi bi-wallet"></i>
+                        <span v-text="abbrAddress(account)" class="d-none d-lg-inline-block"></span> <i
+                            class="fe fe-external-link"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+<div style="height: 80px"><!-- placeholder --></div>
+
+    <div id="vm" class="container">
+        <div class="row">
+            <div class="col-12">
+                <form onsubmit="return false">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="mb-3">
+                                <input v-model="search.tokenId" type="text" class="form-control form-control-sm"
+                                    v-bind:class="{'is-invalid': search.error.tokenId}" placeholder="Token ID">
                             </div>
                         </div>
+                        <div class="col-2">
+                            <div class="mb-3">
+                                <input v-model="search.owner" type="text" class="form-control form-control-sm"
+                                    v-bind:class="{'is-invalid': search.error.owner}" placeholder="Owner">
+                                <div class="form-text">
+                                    <a v-show="canSetMe" v-on:click="setOwnedByMe()" href="#0">Owned by me</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <input v-model="search.creator" type="text" class="form-control form-control-sm"
+                                v-bind:class="{'is-invalid': search.error.creator}" placeholder="Creator">
+                            <div class="form-text">
+                                <a v-show="canSetMe" v-on:click="setCreatedByMe()" href="#0">Created by me</a>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <button v-on:click="searchNFTs" v-bind:disabled="loading" type="button"
+                                class="btn btn-sm btn-outline-primary">Search</button>
+                        </div>
                     </div>
-                    <div v-show="nfts.length>=100" class="mb-4 text-center">
-                        <span>Only the first of 100 NFTs are displayed.</span>
+                </form>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div v-show="loading" class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div v-show="loadError" class="alert alert-danger">
+                    Search failed. Please try later.
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div v-show="nfts.length>0" class="mb-4">
+                    <div v-for="nft in nfts" class="nft">
+                        <div>
+                            <img v-bind:src="nft.image">
+                        </div>
+                        <div class="text-center">
+                            <a v-bind:href="getTokenUrl(nft)" title="Token ID" target="_blank"><i
+                                    class="bi bi-image"></i></a>
+                            <a v-bind:href="getCreatorUrl(nft)" title="Creator" target="_blank"><i
+                                    class="bi bi-person-fill-add"></i></a>
+                            <a v-bind:href="getOwnerUrl(nft)" title="Owner" target="_blank"><i
+                                    class="bi bi-person-fill"></i></a>
+                            <a v-bind:href="getMarketUrl(nft)" title="Market" target="_blank"><i
+                                    class="bi bi-bag-check"></i></a>
+                        </div>
                     </div>
                 </div>
-
+                <div v-show="nfts.length>=100" class="mb-4 text-center">
+                    <span>Only the first of 100 NFTs are displayed.</span>
+                </div>
+                <div v-show="!loading && !loadError && nfts.length===0" class="mb-4 text-center">
+                    <span>No NFT found that matches the search.</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <footer class="p-5 mt-5 bg-light border-top">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="mb-4"><i class="bi bi-images"></i> 1024 Pixels, copyleft 2023</div>
-                    <ul class="list-unstyled small text-muted">
-                        <li class="mb-2">Designed and built by
-                            <a target="_blank" href="https://github.com/michaelliao">Michael Liao
-                                <i class="bi bi-box-arrow-up-right"></i></a>.
-                        </li>
-                        <li class="mb-2">Check the source code on
-                            <a target="_blank" href="https://github.com/michaelliao/1024pixels">Github
-                                <i class="bi bi-box-arrow-up-right"></i></a>
-                        </li>
-                        <li class="mb-2">Code licensed
-                            <a target="_blank"
-                                href="https://github.com/michaelliao/1024pixels/blob/master/LICENSE">GPLv3
-                                <i class="bi bi-box-arrow-up-right"></i></a>
-                        </li>
-                    </ul>
-                </div>
+<!-- footer -->
+<footer class="p-5 mt-5 bg-light border-top">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-4"><i class="bi bi-images"></i> 1024 Pixels, copyleft 2023</div>
+                <ul class="list-unstyled small text-muted">
+                    <li class="mb-2">Designed and built by
+                        <a target="_blank" href="https://github.com/michaelliao">Michael Liao
+                            <i class="bi bi-box-arrow-up-right"></i></a>.
+                    </li>
+                    <li class="mb-2">Check the source code on
+                        <a target="_blank" href="https://github.com/michaelliao/1024pixels">Github
+                            <i class="bi bi-box-arrow-up-right"></i></a>
+                    </li>
+                    <li class="mb-2">Code licensed
+                        <a target="_blank" href="https://github.com/michaelliao/1024pixels/blob/master/LICENSE">GPLv3
+                            <i class="bi bi-box-arrow-up-right"></i></a>
+                    </li>
+                </ul>
             </div>
         </div>
-    </footer>
+    </div>
+</footer>
+<!--// footer -->
 </body>
 
 </html>
