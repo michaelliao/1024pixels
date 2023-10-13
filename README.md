@@ -14,7 +14,7 @@ Only the pixels of index colors stores on chain, and there is exactly 1KB data s
 
 ### How to Get Image from Blockchain
 
-Read the contract [0x1024Accd05Fa01AdbB74502DBDdd8e430d610c53](https://polygonscan.com/address/0x1024accd05fa01adbb74502dbddd8e430d610c53#readContract):
+Read the contract [0x1024E76fbe54D1016f973FaD36f34ce94D9a128D](https://polygonscan.com/address/0x1024E76fbe54D1016f973FaD36f34ce94D9a128D#readContract):
 
 imageURI() returns GIF image as Base64 encoded:
 
