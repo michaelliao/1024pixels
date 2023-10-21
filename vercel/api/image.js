@@ -1,6 +1,6 @@
-import { VercelRequest, VercelResponse } from '@vercel/node'
+const { VercelRequest, VercelResponse } = require('@vercel/node');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const url = 'https://api.thegraph.com/subgraphs/name/michaelliao/1024pixels';
   const id = req.query.id;
   if (!id) {
