@@ -24,11 +24,12 @@ pixelsNfts(where:{id:"${id}"}) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(query)
-  };
+  });
   if (resp.status !== 200) {
     return res.json({
       error: `Bad response: ${resp.status}`
     });
   }
-  return res.json(resp.data);
+  let result = await resp.json();
+  return res.json(result);
 }
